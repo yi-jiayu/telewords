@@ -1,11 +1,11 @@
+from os import getenv
+
+import requests
 from sanic import Sanic
 from sanic.response import json
-from os import getenv
-import requests
 
-from letters import get_letters
-from grid import create_grid
 from game import Game
+from grid import create_grid
 
 app = Sanic()
 bot_token = getenv('TELEGRAM_BOT_TOKEN')
@@ -62,4 +62,5 @@ def start_game(chat_id):
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8000)
+    port = int(getenv('PORT', '8000'))
+    app.run(host="0.0.0.0", port=port)
