@@ -37,7 +37,7 @@ def guess(chat_id, guesser, text):
         print('correct guess!')
         points = result
         url = f'https://api.telegram.org/bot{bot_token}/sendMessage'
-        requests.post(url, data={'chat_id': chat_id, 'text': f'{points} points!'})
+        requests.post(url, data={'chat_id': chat_id, 'text': f'{text}: {points} points!'})
         show_scores(chat_id)
 
 
