@@ -1,8 +1,7 @@
 from collections import defaultdict
+from operator import itemgetter
 
 from more_itertools import grouper
-from operator import itemgetter
-from typing import Tuple
 
 from letters import get_letters, default_wordlist
 
@@ -43,14 +42,14 @@ class Game:
     @staticmethod
     def word_score(word):
         length = len(word)
-        if length < 7:
+        if length <= 5:
             return 1
-        elif length < 9:
+        elif length <= 7:
+            return 2
+        elif length <= 11:
             return 4
-        elif length < 11:
-            return 9
         else:
-            return 16
+            return 9
 
 
 def start_game(chat_id):
