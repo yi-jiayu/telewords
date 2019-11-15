@@ -1,0 +1,6 @@
+[run]
+include =
+    ./*.py
+omit =
+    test/*
+    .venv/*
