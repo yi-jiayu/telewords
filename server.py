@@ -1,4 +1,4 @@
-import json
+import logging
 from os import getenv
 
 import requests
@@ -6,15 +6,10 @@ import sanic.response
 from sanic import Sanic
 
 from game import Game
-from grid import create_grid, grid_to_video
 
 app = Sanic()
 bot_token = getenv("TELEGRAM_BOT_TOKEN")
-base_url = getenv("BASE_URL")
 games = {}
-
-app.static("assets", "assets")
-app.static("pip.html", "pip.html")
 
 
 @app.route("/", methods=["POST"])
@@ -31,63 +26,55 @@ def handle_text(update, text):
     if text.startswith("/startgame"):
         start_game(chat_id)
     elif chat_id in games:
-        guesser = (
-            update["message"]["from"]["id"],
-            update["message"]["from"]["first_name"],
-        )
-        guess(chat_id, guesser, text)
+        name = update["message"]["from"]["first_name"]
+        user_id = update["message"]["from"]["id"]
+        guess(chat_id, user_id, name, text)
 
 
-def guess(chat_id, guesser, text: str):
+def guess(chat_id, user_id, name, text: str):
     game = games[chat_id]
     text = text.lower()
-    result = game.make_guess(guesser, text)
+    result = game.make_guess(user_id, name, text)
     if result is not None:
         points = result
-        url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
-        requests.post(
-            url,
-            data={"chat_id": chat_id, "text": f"{text.capitalize()}: {points} points!"},
+        make_telegram_request(
+            "sendMessage",
+            {"chat_id": chat_id, "text": f"{text.capitalize()}: {points} points!"},
         )
         show_scores(chat_id)
+        make_telegram_request(
+            "sendMessage",
+            {"chat_id": chat_id, "text": game.format_grid(), "parse_mode": "Markdown"},
+        )
 
 
 def show_scores(chat_id):
-    game = games[chat_id]
-    s = ""
-    for guesser, score in game.scores.items():
-        _, name = guesser
-        s += f"{name}: {score} points\n"
-    url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
-    requests.post(url, data={"chat_id": chat_id, "text": s})
+    if chat_id in games:
+        game = games[chat_id]
+        make_telegram_request(
+            "sendMessage",
+            {
+                "chat_id": chat_id,
+                "text": game.format_scores(),
+                "parse_mode": "Markdown",
+            },
+        )
 
 
 def start_game(chat_id):
     game = Game()
     games[chat_id] = game
-    grid = create_grid(game.letters)
+    make_telegram_request(
+        "sendMessage",
+        {"chat_id": chat_id, "text": game.format_grid(), "parse_mode": "Markdown"},
+    )
 
-    # write mp4 version of grid for picture-in-picture overlay
-    grid_to_video(grid, f"assets/{game.letters}.mp4")
 
-    url = f"https://api.telegram.org/bot{bot_token}/sendPhoto"
-    files = {"photo": grid}
-    data = {
-        "chat_id": chat_id,
-        "reply_markup": json.dumps(
-            {
-                "inline_keyboard": [
-                    [
-                        {
-                            "text": "Open overlay",
-                            "url": f"https://{base_url}/pip.html#{game.letters}",
-                        }
-                    ]
-                ]
-            }
-        ),
-    }
-    requests.post(url, files=files, data=data)
+def make_telegram_request(method, params):
+    url = f"https://api.telegram.org/bot{bot_token}/{method}"
+    r = requests.post(url, data=params)
+    if not r.ok:
+        logging.error(r.text)
 
 
 if __name__ == "__main__":

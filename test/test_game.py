@@ -3,12 +3,38 @@ from letters import Wordlist
 
 
 class TestGame:
+    def test_format_grid(self):
+        game = Game(letters="abcdefghijklmnopqrstuvwxy")
+        assert (
+            game.format_grid()
+            == """```
+A  B  C  D  E
+F  G  H  I  J
+K  L  M  N  O
+P  Q  R  S  T
+U  V  W  X  Y
+```"""
+        )
+
+    def test_format_scores(self):
+        wordlist = Wordlist(["hat", "cat", "eat", "teat"])
+        letters = "hatcatea"
+        game = Game(letters=letters, wordlist=wordlist)
+        game.make_guess(1, "Player 1", "hat")
+        game.make_guess(2, "Player 2", "cat")
+        game.make_guess(2, "Player 2", "eat")
+        assert (
+            game.format_scores()
+            == """Player 2: 6 points
+Player 1: 3 points"""
+        )
+
     def test_successful_guess(self):
         wordlist = Wordlist(["hat", "cat", "eat", "teat"])
         letters = "hatcatea"
         game = Game(letters=letters, wordlist=wordlist)
         correct_guess = "hat"
-        assert game.make_guess("player", correct_guess) == Game.word_score(
+        assert game.make_guess(1, "Player 1", correct_guess) == Game.word_score(
             correct_guess
         )
 
@@ -17,4 +43,4 @@ class TestGame:
         letters = "hatcatea"
         game = Game(letters=letters, wordlist=wordlist)
         wrong_guess = "ttt"
-        assert game.make_guess("player", wrong_guess) is None
+        assert game.make_guess(1, "Player 1", wrong_guess) is None

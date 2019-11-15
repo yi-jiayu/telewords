@@ -1,5 +1,8 @@
 from collections import defaultdict
 
+from more_itertools import grouper
+from operator import itemgetter
+
 from letters import get_letters, default_wordlist
 
 states = {}
@@ -11,11 +14,31 @@ class Game:
         wordlist = default_wordlist if wordlist is None else wordlist
         self.words = wordlist.possible_words(self.letters)
         self.scores = defaultdict(lambda: 0)
+        self.players = {}
 
-    def make_guess(self, guesser, guess):
+    def format_grid(self):
+        return (
+            "```\n"
+            + "\n".join(
+                "  ".join(group) for group in grouper(self.letters.upper(), 5, " ")
+            )
+            + "\n```"
+        )
+
+    def format_scores(self):
+        sorted_player_scores = sorted(
+            self.scores.items(), key=itemgetter(1), reverse=True
+        )
+        return "\n".join(
+            f"{self.players[user_id]}: {score} points"
+            for user_id, score in sorted_player_scores
+        )
+
+    def make_guess(self, user_id, name, guess):
         if guess in self.words:
             score = Game.word_score(guess)
-            self.scores[guesser] += score
+            self.scores[user_id] += score
+            self.players[user_id] = name
             self.words.remove(guess)
             return score
 
