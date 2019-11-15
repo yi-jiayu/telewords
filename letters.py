@@ -1,5 +1,5 @@
-from collections import Counter
 import random
+from collections import Counter
 
 alphabet = "abcdefghijklmnopqrstuvwxyz"
 weights = (
@@ -31,11 +31,30 @@ weights = (
     0.004213997433636566,
 )
 
+
+class Wordlist:
+    def __init__(self, words):
+        self.letter_counts = {word: Counter(word) for word in words}
+
+    def _possible_words_generator(self, letters):
+        available_letters = Counter(letters)
+        for word, letter_count in self.letter_counts.items():
+            if all(
+                available_letters.get(letter, 0) >= count
+                for letter, count in letter_count.items()
+            ):
+                yield word
+
+    def possible_words(self, letters):
+        return set(self._possible_words_generator(letters))
+
+
 words = []
 with open("words.txt") as f:
     for line in f:
         word = line.strip()
         words.append(word)
+default_wordlist = Wordlist(words)
 letter_counts = {word: Counter(word) for word in words}
 
 
@@ -43,16 +62,9 @@ def get_letters(k):
     return "".join(random.choices(alphabet, weights, k=k))
 
 
-def find_words(letters):
-    letter_count = Counter(letters)
-    for word, count in letter_counts.items():
-        if all(letter_count.get(letter, 0) >= c for letter, c in count.items()):
-            yield word
-
-
 if __name__ == "__main__":
     letters = get_letters(25)
     print(letters)
-    words = list(find_words(letters))
+    words = default_wordlist.possible_words(letters)
     print(words)
     print(len(words))

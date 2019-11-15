@@ -1,5 +1,4 @@
-from letters import get_letters, find_words
-from grid import create_grid
+from letters import get_letters, default_wordlist
 
 states = {}
 
@@ -8,7 +7,7 @@ class Game:
     def __init__(self, chat_id):
         self.chat_id = chat_id
         self.letters = get_letters(25)
-        self.words = set(find_words(self.letters))
+        self.words = default_wordlist.possible_words(self.letters)
         self.points = {}
 
     def guess(self, guesser, word):
