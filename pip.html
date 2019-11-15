@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Telewords</title>
+</head>
+<body>
+<video id="video" autoplay loop>
+</video>
+<button id="togglePipButton">Toggle Picture-in-Picture</button>
+<script>
+    if (window.location.hash) {
+        console.log(window.location.hash);
+        video.src = `/assets/${window.location.hash.slice(1)}.mp4`;
+    }
+
+    togglePipButton.addEventListener('click', async function (event) {
+        togglePipButton.disabled = true;
+        try {
+            if (video !== document.pictureInPictureElement)
+                await video.requestPictureInPicture();
+            else
+                await document.exitPictureInPicture();
+        } catch (err) {
+            console.error(err)
+        } finally {
+            togglePipButton.disabled = false;
+        }
+    });
+
+    /* Feature support */
+
+    if ('pictureInPictureEnabled' in document) {
+        // Set button ability depending on whether Picture-in-Picture can be used.
+        setPipButton();
+        video.addEventListener('loadedmetadata', setPipButton);
+        video.addEventListener('emptied', setPipButton);
+    }
+
+    function setPipButton() {
+        togglePipButton.disabled = !document.pictureInPictureEnabled ||
+            video.disablePictureInPicture;
+    }
+</script>
+</body>
+</html>

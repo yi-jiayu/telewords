@@ -40,7 +40,7 @@ letter_counts = {word: Counter(word) for word in words}
 
 
 def get_letters(k):
-    return random.choices(alphabet, weights, k=k)
+    return "".join(random.choices(alphabet, weights, k=k))
 
 
 def find_words(letters):

@@ -1,15 +1,20 @@
 from os import getenv
+import json
 
 import requests
 from sanic import Sanic
-from sanic.response import json
+import sanic.response
 
 from game import Game
-from grid import create_grid
+from grid import create_grid, grid_to_video
 
 app = Sanic()
 bot_token = getenv("TELEGRAM_BOT_TOKEN")
+base_url = getenv("HOST")
 games = {}
+
+app.static("assets", "assets")
+app.static("pip.html", "pip.html")
 
 
 @app.route("/", methods=["POST"])
@@ -18,7 +23,7 @@ async def test(request):
     if "message" in update and "text" in update["message"]:
         text = update["message"]["text"]
         handle_text(update, text)
-    return json({})
+    return sanic.response.json({})
 
 
 def handle_text(update, text):
@@ -60,10 +65,26 @@ def start_game(chat_id):
     game = Game(chat_id)
     games[chat_id] = game
     grid = create_grid(game.letters)
+    with open(f"assets/{game.letters}.mp4", "wb") as f:
+        grid_to_video(grid, f)
     url = f"https://api.telegram.org/bot{bot_token}/sendPhoto"
-    data = {"photo": grid.getvalue()}
-    requests.post(url, files=data, data={"chat_id": chat_id})
-    return json({})
+    files = {"photo": grid}
+    data = {
+        "chat_id": chat_id,
+        "reply_markup": json.dumps(
+            {
+                "inline_keyboard": [
+                    [
+                        {
+                            "text": "Open overlay",
+                            "url": f"https://{base_url}/pip.html#{game.letters}",
+                        }
+                    ]
+                ]
+            }
+        ),
+    }
+    requests.post(url, files=files, data=data)
 
 
 if __name__ == "__main__":
