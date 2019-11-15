@@ -2,6 +2,7 @@ from collections import defaultdict
 
 from more_itertools import grouper
 from operator import itemgetter
+from typing import Tuple
 
 from letters import get_letters, default_wordlist
 
@@ -18,11 +19,11 @@ class Game:
 
     def format_grid(self):
         return (
-            "```\n"
-            + "\n".join(
-                "  ".join(group) for group in grouper(self.letters.upper(), 5, " ")
-            )
-            + "\n```"
+                "```\n"
+                + "\n".join(
+            "  ".join(group) for group in grouper(self.letters.upper(), 5, " ")
+        )
+                + "\n```"
         )
 
     def format_scores(self):
@@ -44,7 +45,15 @@ class Game:
 
     @staticmethod
     def word_score(word):
-        return len(word)
+        length = len(word)
+        if length < 7:
+            return 1
+        elif length < 9:
+            return 4
+        elif length < 11:
+            return 9
+        else:
+            return 16
 
 
 def start_game(chat_id):

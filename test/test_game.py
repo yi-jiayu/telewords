@@ -25,8 +25,8 @@ U  V  W  X  Y
         game.make_guess(2, "Player 2", "eat")
         assert (
             game.format_scores()
-            == """Player 2: 6 points
-Player 1: 3 points"""
+            == """Player 2: 2 points
+Player 1: 1 points"""
         )
 
     def test_successful_guess(self):
