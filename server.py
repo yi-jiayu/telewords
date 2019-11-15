@@ -1,9 +1,9 @@
-from os import getenv
 import json
+from os import getenv
 
 import requests
-from sanic import Sanic
 import sanic.response
+from sanic import Sanic
 
 from game import Game
 from grid import create_grid, grid_to_video
@@ -41,9 +41,8 @@ def handle_text(update, text):
 def guess(chat_id, guesser, text: str):
     game = games[chat_id]
     text = text.lower()
-    result = game.guess(guesser, text)
-    if result is not False:
-        print("correct guess!")
+    result = game.make_guess(guesser, text)
+    if result is not None:
         points = result
         url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
         requests.post(
@@ -56,7 +55,7 @@ def guess(chat_id, guesser, text: str):
 def show_scores(chat_id):
     game = games[chat_id]
     s = ""
-    for guesser, score in game.points.items():
+    for guesser, score in game.scores.items():
         _, name = guesser
         s += f"{name}: {score} points\n"
     url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
@@ -64,7 +63,7 @@ def show_scores(chat_id):
 
 
 def start_game(chat_id):
-    game = Game(chat_id)
+    game = Game()
     games[chat_id] = game
     grid = create_grid(game.letters)
     with open(f"assets/{game.letters}.mp4", "wb") as f:
