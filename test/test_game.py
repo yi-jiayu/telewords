@@ -1,13 +1,14 @@
 from game import *
 from letters import Wordlist
+import random
 
 
 class TestGame:
     def test_format_grid(self):
         game = Game(letters="abcdefghijklmnopqrstuvwxy")
         assert (
-            game.format_grid()
-            == """```
+                game.format_grid()
+                == """```
 A  B  C  D  E
 F  G  H  I  J
 K  L  M  N  O
@@ -15,6 +16,12 @@ P  Q  R  S  T
 U  V  W  X  Y
 ```"""
         )
+
+    def test_shuffle_letters(self):
+        game = Game(letters="abcdefghijklmnopqrstuvwxy")
+        random.seed(1)
+        game.shuffle_letters()
+        assert game.letters == 'kuyvxfwnqjlrahbgmtopdicse'
 
     def test_format_scores(self):
         wordlist = Wordlist(["hat", "cat", "eat", "teat"])
@@ -24,8 +31,8 @@ U  V  W  X  Y
         game.make_guess(2, "Player 2", "cat")
         game.make_guess(2, "Player 2", "eat")
         assert (
-            game.format_scores()
-            == """Player 2: 2 points
+                game.format_scores()
+                == """Player 2: 2 points
 Player 1: 1 point"""
         )
 

@@ -1,3 +1,4 @@
+import random
 from collections import defaultdict
 from operator import itemgetter
 
@@ -19,6 +20,11 @@ class Game:
 
     def is_finished(self):
         return self.remaining_rounds <= 0
+
+    def shuffle_letters(self):
+        letters = list(self.letters)
+        random.shuffle(letters)
+        self.letters = ''.join(letters)
 
     def format_grid(self):
         grid = "\n".join(
