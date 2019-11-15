@@ -22,7 +22,7 @@ def create_grid(letters) -> bytes:
     return f.getvalue()
 
 
-def grid_to_video(image, out=tempfile.NamedTemporaryFile()):
+def grid_to_video(image: bytes, output_filename: str):
     with tempfile.NamedTemporaryFile() as f:
         f.write(image)
         f.flush()
@@ -40,8 +40,7 @@ def grid_to_video(image, out=tempfile.NamedTemporaryFile()):
                 "-pix_fmt",
                 "yuv420p",
                 "-y",
-                out.name,
+                output_filename,
             ],
             input=image,
         )
-    return out

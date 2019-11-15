@@ -66,8 +66,10 @@ def start_game(chat_id):
     game = Game()
     games[chat_id] = game
     grid = create_grid(game.letters)
-    with open(f"assets/{game.letters}.mp4", "wb") as f:
-        grid_to_video(grid, f)
+
+    # write mp4 version of grid for picture-in-picture overlay
+    grid_to_video(grid, f"assets/{game.letters}.mp4")
+
     url = f"https://api.telegram.org/bot{bot_token}/sendPhoto"
     files = {"photo": grid}
     data = {
