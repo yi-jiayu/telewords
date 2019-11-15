@@ -1,6 +1,6 @@
 FROM python:3.7-alpine
 
-RUN apk add --update --no-cache build-base freetype-dev libpng-dev jpeg-dev ffmpeg
+RUN apk add --update --no-cache build-base
 
 WORKDIR /usr/src/app
 

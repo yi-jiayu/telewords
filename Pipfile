@@ -7,9 +7,9 @@ verify_ssl = true
 black = "*"
 pytest = "*"
 pytest-cov = "*"
+pipenv-to-requirements = "*"
 
 [packages]
-pillow = "*"
 sanic = "*"
 requests = "*"
 more-itertools = "*"
