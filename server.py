@@ -25,6 +25,8 @@ def handle_text(update, text):
     chat_id = update["message"]["chat"]["id"]
     if text.startswith("/startgame"):
         start_game(chat_id)
+    elif text.startswith('/stop'):
+        stop_game(chat_id)
     elif chat_id in games:
         name = update["message"]["from"]["first_name"]
         user_id = update["message"]["from"]["id"]
@@ -68,6 +70,16 @@ def start_game(chat_id):
         "sendMessage",
         {"chat_id": chat_id, "text": game.format_grid(), "parse_mode": "Markdown"},
     )
+
+
+def stop_game(chat_id):
+    if chat_id in games:
+        game = games[chat_id]
+        make_telegram_request(
+            "sendMessage",
+            {"chat_id": chat_id, "text": f'Final scores:\n\n' + game.format_scores(), "parse_mode": "Markdown"},
+        )
+        del games[chat_id]
 
 
 def make_telegram_request(method, params):
