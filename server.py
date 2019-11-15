@@ -79,7 +79,7 @@ def send_grid(chat_id, game):
         "sendMessage",
         {
             "chat_id": chat_id,
-            "text": game.format_grid() + "\n\n" + message,
+            "text": game.format_grid() + "\n" + message,
             "parse_mode": "Markdown",
         },
     )
