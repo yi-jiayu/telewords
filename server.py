@@ -38,15 +38,17 @@ def handle_text(update, text):
         guess(chat_id, guesser, text)
 
 
-def guess(chat_id, guesser, text):
+def guess(chat_id, guesser, text: str):
     game = games[chat_id]
+    text = text.lower()
     result = game.guess(guesser, text)
     if result is not False:
         print("correct guess!")
         points = result
         url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
         requests.post(
-            url, data={"chat_id": chat_id, "text": f"{text}: {points} points!"}
+            url,
+            data={"chat_id": chat_id, "text": f"{text.capitalize()}: {points} points!"},
         )
         show_scores(chat_id)
 
