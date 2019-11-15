@@ -26,7 +26,7 @@ U  V  W  X  Y
         assert (
             game.format_scores()
             == """Player 2: 2 points
-Player 1: 1 points"""
+Player 1: 1 point"""
         )
 
     def test_successful_guess(self):

@@ -9,12 +9,16 @@ states = {}
 
 
 class Game:
-    def __init__(self, k=25, letters=None, wordlist=None):
+    def __init__(self, k=25, letters=None, wordlist=None, num_rounds=30):
         self.letters = get_letters(k) if letters is None else letters
         wordlist = default_wordlist if wordlist is None else wordlist
         self.words = wordlist.possible_words(self.letters)
         self.scores = defaultdict(lambda: 0)
         self.players = {}
+        self.remaining_rounds = num_rounds
+
+    def is_finished(self):
+        return self.remaining_rounds <= 0
 
     def format_grid(self):
         grid = "\n".join(
@@ -27,7 +31,7 @@ class Game:
             self.scores.items(), key=itemgetter(1), reverse=True
         )
         return "\n".join(
-            f"{self.players[user_id]}: {score} points"
+            f"{self.players[user_id]}: {score} {'point' if score == 1 else 'points'}"
             for user_id, score in sorted_player_scores
         )
 
@@ -37,6 +41,7 @@ class Game:
             self.scores[user_id] += score
             self.players[user_id] = name
             self.words.remove(guess)
+            self.remaining_rounds -= 1
             return score
 
     @staticmethod

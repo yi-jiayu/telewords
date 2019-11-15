@@ -25,7 +25,7 @@ def handle_text(update, text):
     chat_id = update["message"]["chat"]["id"]
     if text.startswith("/startgame"):
         start_game(chat_id)
-    elif text.startswith('/stop'):
+    elif text.startswith("/stop"):
         stop_game(chat_id)
     elif chat_id in games:
         name = update["message"]["from"]["first_name"]
@@ -44,10 +44,9 @@ def guess(chat_id, user_id, name, text: str):
             {"chat_id": chat_id, "text": f"{text.capitalize()}: {points} points!"},
         )
         show_scores(chat_id)
-        make_telegram_request(
-            "sendMessage",
-            {"chat_id": chat_id, "text": game.format_grid(), "parse_mode": "Markdown"},
-        )
+        send_grid(chat_id, game)
+        if game.is_finished():
+            stop_game(chat_id)
 
 
 def show_scores(chat_id):
@@ -66,9 +65,23 @@ def show_scores(chat_id):
 def start_game(chat_id):
     game = Game()
     games[chat_id] = game
+    send_grid(chat_id, game)
+
+
+def send_grid(chat_id, game):
+    if game.remaining_rounds == 1:
+        message = "Last round!"
+    elif game.remaining_rounds == 0:
+        message = "Game over!"
+    else:
+        message = f"{game.remaining_rounds} rounds remaining!"
     make_telegram_request(
         "sendMessage",
-        {"chat_id": chat_id, "text": game.format_grid(), "parse_mode": "Markdown"},
+        {
+            "chat_id": chat_id,
+            "text": game.format_grid() + "\n\n" + message,
+            "parse_mode": "Markdown",
+        },
     )
 
 
@@ -77,7 +90,11 @@ def stop_game(chat_id):
         game = games[chat_id]
         make_telegram_request(
             "sendMessage",
-            {"chat_id": chat_id, "text": f'Final scores:\n\n' + game.format_scores(), "parse_mode": "Markdown"},
+            {
+                "chat_id": chat_id,
+                "text": f"*Final scores*\n\n" + game.format_scores(),
+                "parse_mode": "Markdown",
+            },
         )
         del games[chat_id]
 
