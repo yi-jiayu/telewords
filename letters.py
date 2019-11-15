@@ -55,7 +55,6 @@ with open("words.txt") as f:
         word = line.strip()
         words.append(word)
 default_wordlist = Wordlist(words)
-letter_counts = {word: Counter(word) for word in words}
 
 
 def get_letters(k):

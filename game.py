@@ -18,13 +18,10 @@ class Game:
         self.players = {}
 
     def format_grid(self):
-        return (
-                "```\n"
-                + "\n".join(
+        grid = "\n".join(
             "  ".join(group) for group in grouper(self.letters.upper(), 5, " ")
         )
-                + "\n```"
-        )
+        return f"```\n{grid}\n```"
 
     def format_scores(self):
         sorted_player_scores = sorted(
