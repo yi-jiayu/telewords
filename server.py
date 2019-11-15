@@ -10,7 +10,7 @@ from grid import create_grid, grid_to_video
 
 app = Sanic()
 bot_token = getenv("TELEGRAM_BOT_TOKEN")
-base_url = getenv("HOST")
+base_url = getenv("BASE_URL")
 games = {}
 
 app.static("assets", "assets")
