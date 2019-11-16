@@ -8,4 +8,11 @@ def get_definition(word):
     c.execute("select definition from words where word = ?", (word,))
     row = c.fetchone()
     if row is not None:
-        return row[0]
+        return summarise(row[0])
+
+
+def summarise(definition):
+    return "\n\n".join(
+        line if len(line) <= 100 else line[:100] + "..."
+        for line in definition.split("\n\n")
+    )
