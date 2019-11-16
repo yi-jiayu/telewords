@@ -25,7 +25,7 @@ async def handle(request):
 
 async def handle_text(update, text):
     chat_id = update["message"]["chat"]["id"]
-    if text.startswith("/startgame"):
+    if text.startswith("/start"):
         await start_game(chat_id)
     elif text.startswith("/stop"):
         await stop_game(chat_id)
