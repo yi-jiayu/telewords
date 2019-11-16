@@ -6,6 +6,7 @@ import sanic.response
 from sanic import Sanic
 
 from game import Game
+from dictionary import get_definition
 
 app = Sanic()
 bot_token = getenv("TELEGRAM_BOT_TOKEN")
@@ -39,9 +40,13 @@ def guess(chat_id, user_id, name, text: str):
     result = game.make_guess(user_id, name, text)
     if result is not None:
         points = result
+        message = f"{text.capitalize()}: {points} points!"
+        definition = get_definition(text)
+        if definition is not None:
+            message += '\n' + definition
         make_telegram_request(
             "sendMessage",
-            {"chat_id": chat_id, "text": f"{text.capitalize()}: {points} points!"},
+            {"chat_id": chat_id, "text": message},
         )
         show_scores(chat_id)
         game.shuffle_letters()
