@@ -49,7 +49,6 @@ def guess(chat_id, user_id, name, text: str):
             {"chat_id": chat_id, "text": message},
         )
         show_scores(chat_id)
-        game.shuffle_letters()
         send_grid(chat_id, game)
         if game.is_finished():
             stop_game(chat_id)

@@ -17,12 +17,6 @@ U  V  W  X  Y
 ```"""
         )
 
-    def test_shuffle_letters(self):
-        game = Game(letters="abcdefghijklmnopqrstuvwxy")
-        random.seed(1)
-        game.shuffle_letters()
-        assert game.letters == 'kuyvxfwnqjlrahbgmtopdicse'
-
     def test_format_scores(self):
         wordlist = Wordlist(["hat", "cat", "eat", "teat"])
         letters = "hatcatea"
