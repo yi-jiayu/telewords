@@ -1,4 +1,3 @@
-import random
 from collections import defaultdict
 from operator import itemgetter
 
@@ -35,6 +34,9 @@ class Game:
             f"{self.players[user_id]}: {score} {'point' if score == 1 else 'points'}"
             for user_id, score in sorted_player_scores
         )
+
+    def longest_remaining_words(self, n=5):
+        return sorted(self.words, key=len, reverse=True)[:n]
 
     def make_guess(self, user_id, name, guess):
         if guess in self.words:

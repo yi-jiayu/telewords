@@ -1,6 +1,5 @@
 from game import *
 from letters import Wordlist
-import random
 
 
 class TestGame:
@@ -45,3 +44,10 @@ Player 1: 1 point"""
         game = Game(letters=letters, wordlist=wordlist)
         wrong_guess = "ttt"
         assert game.make_guess(1, "Player 1", wrong_guess) is None
+
+    def test_longest_remaining_words(self):
+        wordlist = Wordlist(["hat", "cat", "predator", "conversation"])
+        letters = "hatcatpredatorconversation"
+        game = Game(letters=letters, wordlist=wordlist)
+        game.make_guess(1, "Player 1", "hat")
+        assert game.longest_remaining_words() == ["conversation", "predator", "cat"]
