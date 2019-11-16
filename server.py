@@ -43,10 +43,9 @@ def guess(chat_id, user_id, name, text: str):
         message = f"{text.capitalize()}: {points} points!"
         definition = get_definition(text)
         if definition is not None:
-            message += '\n' + definition
+            message += "\n" + definition
         make_telegram_request(
-            "sendMessage",
-            {"chat_id": chat_id, "text": message},
+            "sendMessage", {"chat_id": chat_id, "text": message},
         )
         show_scores(chat_id)
         send_grid(chat_id, game)

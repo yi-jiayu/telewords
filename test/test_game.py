@@ -7,8 +7,8 @@ class TestGame:
     def test_format_grid(self):
         game = Game(letters="abcdefghijklmnopqrstuvwxy")
         assert (
-                game.format_grid()
-                == """```
+            game.format_grid()
+            == """```
 A  B  C  D  E
 F  G  H  I  J
 K  L  M  N  O
@@ -25,8 +25,8 @@ U  V  W  X  Y
         game.make_guess(2, "Player 2", "cat")
         game.make_guess(2, "Player 2", "eat")
         assert (
-                game.format_scores()
-                == """Player 2: 2 points
+            game.format_scores()
+            == """Player 2: 2 points
 Player 1: 1 point"""
         )
 
