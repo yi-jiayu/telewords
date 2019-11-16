@@ -16,8 +16,10 @@ chardet==3.0.4
 h11==0.8.1
 h2==3.1.1
 hpack==3.0.0
+hstspreload==2019.11.12
 httpcore==0.3.0
 httptools==0.0.13
+httpx==0.7.7
 hyperframe==5.2.0
 idna==2.8
 more-itertools==7.2.0

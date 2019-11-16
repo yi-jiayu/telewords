@@ -11,8 +11,8 @@ pipenv-to-requirements = "*"
 
 [packages]
 sanic = "*"
-requests = "*"
 more-itertools = "*"
+httpx = "*"
 
 [requires]
 python_version = "3.7"

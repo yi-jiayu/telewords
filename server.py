@@ -1,7 +1,7 @@
 import logging
 from os import getenv
 
-import requests
+import httpx
 import sanic.response
 from sanic import Sanic
 
@@ -14,27 +14,27 @@ games = {}
 
 
 @app.route("/", methods=["POST"])
-async def test(request):
+async def handle(request):
     update = request.json
     if "message" in update and "text" in update["message"]:
         text = update["message"]["text"]
-        handle_text(update, text)
+        await handle_text(update, text)
     return sanic.response.json({})
 
 
-def handle_text(update, text):
+async def handle_text(update, text):
     chat_id = update["message"]["chat"]["id"]
     if text.startswith("/startgame"):
-        start_game(chat_id)
+        await start_game(chat_id)
     elif text.startswith("/stop"):
-        stop_game(chat_id)
+        await stop_game(chat_id)
     elif chat_id in games:
         name = update["message"]["from"]["first_name"]
         user_id = update["message"]["from"]["id"]
-        guess(chat_id, user_id, name, text)
+        await guess(chat_id, user_id, name, text)
 
 
-def guess(chat_id, user_id, name, text: str):
+async def guess(chat_id, user_id, name, text: str):
     game = games[chat_id]
     text = text.lower()
     result = game.make_guess(user_id, name, text)
@@ -44,19 +44,19 @@ def guess(chat_id, user_id, name, text: str):
         definition = get_definition(text)
         if definition is not None:
             message += "\n" + definition
-        make_telegram_request(
+        await make_telegram_request(
             "sendMessage", {"chat_id": chat_id, "text": message},
         )
-        show_scores(chat_id)
-        send_grid(chat_id, game)
+        await show_scores(chat_id)
+        await send_grid(chat_id, game)
         if game.is_finished():
-            stop_game(chat_id)
+            await stop_game(chat_id)
 
 
-def show_scores(chat_id):
+async def show_scores(chat_id):
     if chat_id in games:
         game = games[chat_id]
-        make_telegram_request(
+        await make_telegram_request(
             "sendMessage",
             {
                 "chat_id": chat_id,
@@ -66,20 +66,20 @@ def show_scores(chat_id):
         )
 
 
-def start_game(chat_id):
+async def start_game(chat_id):
     game = Game()
     games[chat_id] = game
-    send_grid(chat_id, game)
+    await send_grid(chat_id, game)
 
 
-def send_grid(chat_id, game):
+async def send_grid(chat_id, game):
     if game.remaining_rounds == 1:
         message = "Last round!"
     elif game.remaining_rounds == 0:
         message = "Game over!"
     else:
         message = f"{game.remaining_rounds} rounds remaining!"
-    make_telegram_request(
+    await make_telegram_request(
         "sendMessage",
         {
             "chat_id": chat_id,
@@ -89,10 +89,10 @@ def send_grid(chat_id, game):
     )
 
 
-def stop_game(chat_id):
+async def stop_game(chat_id):
     if chat_id in games:
         game = games[chat_id]
-        make_telegram_request(
+        await make_telegram_request(
             "sendMessage",
             {
                 "chat_id": chat_id,
@@ -103,10 +103,11 @@ def stop_game(chat_id):
         del games[chat_id]
 
 
-def make_telegram_request(method, params):
+async def make_telegram_request(method, params):
     url = f"https://api.telegram.org/bot{bot_token}/{method}"
-    r = requests.post(url, data=params)
-    if not r.ok:
+    async with httpx.AsyncClient() as client:
+        r = await client.post(url, data=params)
+    if not 200 <= r.status_code < 400:
         logging.error(r.text)
 
 
