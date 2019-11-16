@@ -13,6 +13,7 @@ pipenv-to-requirements = "*"
 sanic = "*"
 more-itertools = "*"
 httpx = "*"
+nltk = "*"
 
 [requires]
 python_version = "3.7"
