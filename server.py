@@ -42,9 +42,6 @@ async def guess(chat_id, user_id, name, text: str):
     if result is not None:
         word, points = result
         message = f"{word.capitalize()}: {points} points!"
-        definition = get_definition(text)
-        if definition is not None:
-            message += "\n" + definition
         await gather(
             send_message(chat_id, message),
             show_scores(chat_id),
