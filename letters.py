@@ -51,7 +51,14 @@ class Wordlist:
         return set(self._possible_words_generator(letters))
 
 
-default_wordlist = Wordlist(word for word in wn.all_lemma_names() if word.isalpha() and len(word) >= 4)
+default_wordlist = Wordlist(
+    word for word in wn.all_lemma_names() if word.isalpha() and len(word) >= 4
+)
+
+common_words = set()
+with open("common_words.txt") as f:
+    for line in f:
+        common_words.add(line.strip())
 
 
 def get_letters(k):
