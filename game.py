@@ -63,7 +63,7 @@ class Game:
     def get_hint(self):
         uncommon_words = self.words - self.common_words
         hint = redact_letters(
-            random.choice([word for word in uncommon_words if len(word) > 7])
+            random.choice([word for word in uncommon_words if len(word) > 7]), 0.3
         )
         return " ".join(hint)
 
