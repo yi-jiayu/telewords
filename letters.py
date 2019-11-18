@@ -1,6 +1,8 @@
 import random
 from collections import Counter
 
+from nltk.corpus import wordnet as wn
+
 alphabet = "abcdefghijklmnopqrstuvwxyz"
 weights = (
     0.08463264442962931,
@@ -49,12 +51,7 @@ class Wordlist:
         return set(self._possible_words_generator(letters))
 
 
-words = []
-with open("words.txt") as f:
-    for line in f:
-        word = line.strip()
-        words.append(word)
-default_wordlist = Wordlist(words)
+default_wordlist = Wordlist(wn.all_lemma_names())
 
 
 def get_letters(k):
