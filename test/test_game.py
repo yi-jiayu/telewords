@@ -34,8 +34,19 @@ Player 1: 1 point"""
         letters = "hatcatea"
         game = Game(letters=letters, wordlist=wordlist)
         correct_guess = "hat"
-        assert game.make_guess(1, "Player 1", correct_guess) == Game.word_score(
-            correct_guess
+        assert game.make_guess(1, "Player 1", correct_guess) == (
+            "hat",
+            Game.word_score(correct_guess),
+        )
+
+    def test_successful_guess_normalises_word(self):
+        wordlist = Wordlist(["hat"])
+        letters = "hats"
+        game = Game(letters=letters, wordlist=wordlist)
+        correct_guess = "hats"
+        assert game.make_guess(1, "Player 1", correct_guess) == (
+            "hat",
+            Game.word_score(correct_guess),
         )
 
     def test_unsuccessful_guess(self):

@@ -40,8 +40,8 @@ async def guess(chat_id, user_id, name, text: str):
     text = text.lower()
     result = game.make_guess(user_id, name, text)
     if result is not None:
-        points = result
-        message = f"{text.capitalize()}: {points} points!"
+        word, points = result
+        message = f"{word.capitalize()}: {points} points!"
         definition = get_definition(text)
         if definition is not None:
             message += "\n" + definition

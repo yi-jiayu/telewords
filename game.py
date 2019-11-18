@@ -2,6 +2,7 @@ from collections import defaultdict
 from operator import itemgetter
 
 from more_itertools import grouper
+from nltk.corpus import wordnet as wn
 
 from letters import get_letters, default_wordlist
 
@@ -39,13 +40,16 @@ class Game:
         return sorted(self.words, key=len, reverse=True)[:n]
 
     def make_guess(self, user_id, name, guess):
+        guess = wn.morphy(guess)
+        if guess is None:
+            return
         if guess in self.words:
             score = Game.word_score(guess)
             self.scores[user_id] += score
             self.players[user_id] = name
             self.words.remove(guess)
             self.remaining_rounds -= 1
-            return score
+            return guess, score
 
     @staticmethod
     def word_score(word):
