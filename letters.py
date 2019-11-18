@@ -55,14 +55,22 @@ default_wordlist = Wordlist(
     word for word in wn.all_lemma_names() if word.isalpha() and len(word) >= 4
 )
 
-common_words = set()
+common_words = []
 with open("common_words.txt") as f:
     for line in f:
-        common_words.add(line.strip())
+        common_words.append(line.strip())
+common_words = frozenset(common_words)
 
 
 def get_letters(k):
     return "".join(random.choices(alphabet, weights, k=k))
+
+
+def redact_letters(word, p=0.5):
+    num_letters_to_block = int(len(word) * p)
+    mask = [True] * num_letters_to_block + [False] * (len(word) - num_letters_to_block)
+    random.shuffle(mask)
+    return "".join("_" if masked else c for c, masked in zip(word, mask))
 
 
 if __name__ == "__main__":

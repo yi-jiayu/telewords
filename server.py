@@ -75,7 +75,11 @@ async def send_grid(chat_id, game):
         message = "Game over!"
     else:
         message = f"{game.remaining_rounds} rounds remaining!"
-    await send_message(chat_id, game.format_grid() + "\n" + message)
+    if game.remaining_rounds > 0:
+        message += "\n\n" + f"<em>Hint: {game.get_hint()}</em>"
+    await send_message(
+        chat_id, f"<pre>{game.format_grid()}</pre>" + "\n" + message, parse_mode="HTML"
+    )
 
 
 async def stop_game(chat_id):

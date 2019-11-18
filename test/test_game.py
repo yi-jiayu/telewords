@@ -7,13 +7,11 @@ class TestGame:
         game = Game(letters="abcdefghijklmnopqrstuvwxy")
         assert (
             game.format_grid()
-            == """```
-A  B  C  D  E
+            == """A  B  C  D  E
 F  G  H  I  J
 K  L  M  N  O
 P  Q  R  S  T
-U  V  W  X  Y
-```"""
+U  V  W  X  Y"""
         )
 
     def test_format_scores(self):
@@ -48,6 +46,15 @@ Player 1: 1 point"""
             "hat",
             Game.word_score(correct_guess),
         )
+
+    def test_get_hint(self):
+        game = Game(
+            letters="hcatlongword",
+            wordlist=Wordlist(["hat", "cat", "longword"]),
+            common_words=frozenset(["hat"]),
+        )
+        random.seed(1)
+        assert game.get_hint() == "l o n g _ _ _ _"
 
     def test_unsuccessful_guess(self):
         wordlist = Wordlist(["hat", "cat", "eat", "teat"])

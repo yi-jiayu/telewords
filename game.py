@@ -1,19 +1,28 @@
+import random
 from collections import defaultdict
 from operator import itemgetter
 
 from more_itertools import grouper
 from nltk.corpus import wordnet as wn
 
-from letters import get_letters, default_wordlist
+from letters import get_letters, default_wordlist, common_words, redact_letters
 
 states = {}
 
 
 class Game:
-    def __init__(self, k=25, letters=None, wordlist=None, num_rounds=30):
+    def __init__(
+        self,
+        k=25,
+        letters=None,
+        wordlist=None,
+        num_rounds=30,
+        common_words=common_words,
+    ):
         self.letters = get_letters(k) if letters is None else letters
         wordlist = default_wordlist if wordlist is None else wordlist
         self.words = wordlist.possible_words(self.letters)
+        self.common_words = common_words
         self.scores = defaultdict(lambda: 0)
         self.players = {}
         self.remaining_rounds = num_rounds
@@ -25,7 +34,7 @@ class Game:
         grid = "\n".join(
             "  ".join(group) for group in grouper(self.letters.upper(), 5, " ")
         )
-        return f"```\n{grid}\n```"
+        return f"{grid}"
 
     def format_scores(self):
         sorted_player_scores = sorted(
@@ -50,6 +59,13 @@ class Game:
             self.words.remove(guess)
             self.remaining_rounds -= 1
             return guess, score
+
+    def get_hint(self):
+        uncommon_words = self.words - self.common_words
+        hint = redact_letters(
+            random.choice([word for word in uncommon_words if len(word) > 7])
+        )
+        return " ".join(hint)
 
     @staticmethod
     def word_score(word):
