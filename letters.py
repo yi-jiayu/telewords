@@ -51,7 +51,7 @@ class Wordlist:
         return set(self._possible_words_generator(letters))
 
 
-default_wordlist = Wordlist(wn.all_lemma_names())
+default_wordlist = Wordlist(word for word in wn.all_lemma_names() if word.isalpha() and len(word) >= 4)
 
 
 def get_letters(k):
