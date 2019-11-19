@@ -56,10 +56,15 @@ class Game:
         return f"*Final scores*\n{self.format_scores()}", "Markdown"
 
     def _correct_guess_message(self, guess, name, score):
+        if guess in self.common_words:
+            definition = ""
+        else:
+            definition = f"{guess.capitalize()} means:\n{get_definition(guess)}\n\n"
+
         return (
             f"""{name} guessed "{guess}" for {score} {"point" if score == 1 else "points"}!
 
-*Current scores*
+{definition}*Current scores*
 {self.format_scores()}""",
             "Markdown",
         )

@@ -50,6 +50,9 @@ A  N  U  I  E</pre>
             (
                 """Player 2 guessed "trackable" for 4 points!
 
+Trackable means:
+(a) capable of being traced or tracked
+
 *Current scores*
 Player 2: 4 points
 Player 1: 1 point""",
@@ -94,6 +97,9 @@ Last round!""",
         assert list(game.guess(2, "Player 2", "trackable")) == [
             (
                 """Player 2 guessed "trackable" for 4 points!
+
+Trackable means:
+(a) capable of being traced or tracked
 
 *Current scores*
 Player 2: 4 points
