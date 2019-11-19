@@ -174,7 +174,7 @@ rebelliousness
     def test_format_grid(self):
         game = Game(letters="abcdefghijklmnopqrstuvwxy")
         assert (
-            game.format_grid()
+            game._format_grid()
             == """A  B  C  D  E
 F  G  H  I  J
 K  L  M  N  O

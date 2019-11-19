@@ -52,8 +52,20 @@ class Game:
             if self.remaining_rounds > 0:
                 yield self._grid_message()
 
+    def is_finished(self):
+        return self.remaining_rounds <= 0
+
+    def get_hint(self):
+        uncommon_words = self.words - self.common_words
+        hint = redact_letters(
+            random.choice(
+                [word for word in uncommon_words if len(word) > MIN_HINT_LENGTH]
+            )
+        )
+        return " ".join(hint)
+
     def _final_scores_message(self):
-        return f"*Final scores*\n{self.format_scores()}", "Markdown"
+        return f"*Final scores*\n{self._format_scores()}", "Markdown"
 
     def _correct_guess_message(self, guess, name, score):
         if guess in self.common_words:
@@ -65,7 +77,7 @@ class Game:
             f"""{name} guessed "{guess}" for {score} {"point" if score == 1 else "points"}!
 
 {definition}*Current scores*
-{self.format_scores()}""",
+{self._format_scores()}""",
             "Markdown",
         )
 
@@ -77,23 +89,20 @@ class Game:
 
     def _grid_message(self):
         return (
-            f"""<pre>{self.format_grid()}</pre>
+            f"""<pre>{self._format_grid()}</pre>
 <em>Hint: {self.get_hint()}</em>
 
 {self._remaining_rounds_message()}""",
             "HTML",
         )
 
-    def is_finished(self):
-        return self.remaining_rounds <= 0
-
-    def format_grid(self):
+    def _format_grid(self):
         grid = "\n".join(
             "  ".join(group) for group in grouper(self.letters.upper(), 5, " ")
         )
         return f"{grid}"
 
-    def format_scores(self):
+    def _format_scores(self):
         sorted_player_scores = sorted(
             self.scores.items(), key=itemgetter(1), reverse=True
         )
@@ -104,15 +113,6 @@ class Game:
 
     def _longest_remaining_words(self, n=5):
         return sorted(self.words, key=len, reverse=True)[:n]
-
-    def get_hint(self):
-        uncommon_words = self.words - self.common_words
-        hint = redact_letters(
-            random.choice(
-                [word for word in uncommon_words if len(word) > MIN_HINT_LENGTH]
-            )
-        )
-        return " ".join(hint)
 
     @staticmethod
     def word_score(word):
