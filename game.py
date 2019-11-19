@@ -14,11 +14,17 @@ from letters import (
 )
 
 MIN_HINT_LENGTH = 7
+DEFAULT_GAME_LENGTH = 15
 
 
 class Game:
     def __init__(
-        self, k=25, letters=None, wordlist=None, common_words=None, num_rounds=30,
+        self,
+        k=25,
+        letters=None,
+        wordlist=None,
+        common_words=None,
+        num_rounds=DEFAULT_GAME_LENGTH,
     ):
         self.letters = get_letters(k) if letters is None else letters
         wordlist = default_wordlist if wordlist is None else wordlist
