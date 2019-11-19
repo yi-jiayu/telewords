@@ -25,7 +25,7 @@ async def handle(request):
 async def handle_text(update, text):
     chat_id = update["message"]["chat"]["id"]
     if text.startswith("/start"):
-        await start_game(chat_id)
+        await start_game(chat_id, text)
     elif text.startswith("/stop"):
         await stop_game(chat_id)
     elif text.startswith("/hint"):
@@ -59,8 +59,16 @@ async def send_hint(chat_id):
         )
 
 
-async def start_game(chat_id):
-    game = Game()
+async def start_game(chat_id, text):
+    kwargs = {}
+    args = text.split()
+    if len(args) > 1:
+        try:
+            num_rounds = int(args[1])
+            kwargs["num_rounds"] = num_rounds
+        except ValueError:
+            pass
+    game = Game(**kwargs)
     games[chat_id] = game
     replies = (
         send_message(chat_id, text, parse_mode) for text, parse_mode in game.start()
