@@ -8,7 +8,6 @@ from sanic import Sanic
 
 from dictionary import get_definition
 from game import Game
-from letters import common_words
 
 app = Sanic()
 bot_token = getenv("TELEGRAM_BOT_TOKEN")
@@ -40,22 +39,13 @@ async def handle_text(update, text):
 
 async def guess(chat_id, user_id, name, text: str):
     game = games[chat_id]
-    text = text.lower()
-    result = game.make_guess(user_id, name, text)
-    if result is not None:
-        word, points = result
-        message = f"{word.capitalize()}: {points} points!"
-        if word not in common_words:
-            definition = get_definition(text)
-            if definition is not None:
-                message += "\n" + definition
-        await gather(
-            send_message(chat_id, message),
-            show_scores(chat_id),
-            send_grid(chat_id, game),
-        )
-        if game.is_finished():
-            await stop_game(chat_id)
+    replies = (
+        send_message(chat_id, text, parse_mode)
+        for text, parse_mode in game.guess(user_id, name, text)
+    )
+    await gather(*replies)
+    if game.is_finished():
+        await stop_game(chat_id)
 
 
 async def send_hint(chat_id):
@@ -79,7 +69,10 @@ async def show_scores(chat_id):
 async def start_game(chat_id):
     game = Game()
     games[chat_id] = game
-    await send_grid(chat_id, game)
+    replies = (
+        send_message(chat_id, text, parse_mode) for text, parse_mode in game.start()
+    )
+    await gather(*replies)
 
 
 async def send_grid(chat_id, game):

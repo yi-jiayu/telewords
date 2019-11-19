@@ -5,27 +5,45 @@ from operator import itemgetter
 from more_itertools import grouper
 from nltk.corpus import wordnet as wn
 
-from letters import get_letters, default_wordlist, common_words, redact_letters
+from letters import (
+    get_letters,
+    default_wordlist,
+    common_words as default_common_words,
+    redact_letters,
+)
 
 states = {}
 
 
 class Game:
     def __init__(
-        self,
-        k=25,
-        letters=None,
-        wordlist=None,
-        num_rounds=30,
-        common_words=common_words,
+        self, k=25, letters=None, wordlist=None, common_words=None, num_rounds=30,
     ):
         self.letters = get_letters(k) if letters is None else letters
         wordlist = default_wordlist if wordlist is None else wordlist
         self.words = wordlist.possible_words(self.letters)
-        self.common_words = common_words
+        self.common_words = (
+            default_common_words if common_words is None else common_words
+        )
         self.scores = defaultdict(lambda: 0)
         self.players = {}
         self.remaining_rounds = num_rounds
+
+    def start(self):
+        yield f"<pre>{self.format_grid()}</pre>\n\n<em>Hint: {self.get_hint()}</em>", "HTML"
+
+    def guess(self, id, name, guess):
+        guess = wn.morphy(guess.lower())
+        if guess is None:
+            return
+        if guess in self.words:
+            score = Game.word_score(guess)
+            self.scores[id] += score
+            self.players[id] = name
+            self.words.remove(guess)
+            self.remaining_rounds -= 1
+            yield f'{name} guessed "{guess}" for {score} {"point" if score == 1 else "points"}!\n\n*Current scores*\n{self.format_scores()}', "Markdown"
+            yield f"<pre>{self.format_grid()}</pre>\n\n<em>Hint: {self.get_hint()}</em>", "HTML"
 
     def is_finished(self):
         return self.remaining_rounds <= 0
@@ -48,22 +66,10 @@ class Game:
     def longest_remaining_words(self, n=5):
         return sorted(self.words, key=len, reverse=True)[:n]
 
-    def make_guess(self, user_id, name, guess):
-        guess = wn.morphy(guess)
-        if guess is None:
-            return
-        if guess in self.words:
-            score = Game.word_score(guess)
-            self.scores[user_id] += score
-            self.players[user_id] = name
-            self.words.remove(guess)
-            self.remaining_rounds -= 1
-            return guess, score
-
     def get_hint(self):
         uncommon_words = self.words - self.common_words
         hint = redact_letters(
-            random.choice([word for word in uncommon_words if len(word) > 7]), 0.3
+            random.choice([word for word in uncommon_words if len(word) > 7])
         )
         return " ".join(hint)
 

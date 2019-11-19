@@ -1,5 +1,4 @@
-import random
-
+from helpers import random_seed
 from letters import get_letters, Wordlist, redact_letters
 
 
@@ -14,8 +13,8 @@ class TestWordlist:
         assert wordlist.possible_words("hatcatea") == {"hat", "cat", "eat", "teat"}
 
 
+@random_seed(1)
 def test_redact_letters():
-    random.seed(1)
     assert redact_letters("colonoscopy", 0.5) == "colon____p_"
     assert redact_letters("colonoscopy", 0.75) == "_o_o_o_____"
     assert redact_letters("colonoscopy", 0.25) == "colono_c_py"

@@ -1,8 +1,69 @@
-from game import *
+from game import Game
+from helpers import random_seed
 from letters import Wordlist
 
 
 class TestGame:
+    @random_seed(1)
+    def test_game_start(self):
+        game = Game()
+        assert list(game.start()) == [
+            (
+                """<pre>C  S  R  E  L
+L  O  S  B  A
+S  I  R  A  K
+R  E  U  T  A
+A  N  U  I  E</pre>
+
+<em>Hint: _ r o _ i n a _ _</em>""",
+                "HTML",
+            )
+        ]
+
+    @random_seed(1)
+    def test_correct_guesses(self):
+        game = Game()
+        list(game.start())
+        assert list(game.guess(1, "Player 1", "locus")) == [
+            (
+                """Player 1 guessed "locus" for 1 point!
+
+*Current scores*
+Player 1: 1 point""",
+                "Markdown",
+            ),
+            (
+                """<pre>C  S  R  E  L
+L  O  S  B  A
+S  I  R  A  K
+R  E  U  T  A
+A  N  U  I  E</pre>
+
+<em>Hint: c o _ _ s e _ _ _ s</em>""",
+                "HTML",
+            ),
+        ]
+        assert list(game.guess(2, "Player 2", "trackable")) == [
+            (
+                """Player 2 guessed "trackable" for 4 points!
+
+*Current scores*
+Player 2: 4 points
+Player 1: 1 point""",
+                "Markdown",
+            ),
+            (
+                """<pre>C  S  R  E  L
+L  O  S  B  A
+S  I  R  A  K
+R  E  U  T  A
+A  N  U  I  E</pre>
+
+<em>Hint: _ _ _ _ n i s e</em>""",
+                "HTML",
+            ),
+        ]
+
     def test_format_grid(self):
         game = Game(letters="abcdefghijklmnopqrstuvwxy")
         assert (
@@ -14,58 +75,11 @@ P  Q  R  S  T
 U  V  W  X  Y"""
         )
 
-    def test_format_scores(self):
-        wordlist = Wordlist(["hat", "cat", "eat", "teat"])
-        letters = "hatcatea"
-        game = Game(letters=letters, wordlist=wordlist)
-        game.make_guess(1, "Player 1", "hat")
-        game.make_guess(2, "Player 2", "cat")
-        game.make_guess(2, "Player 2", "eat")
-        assert (
-            game.format_scores()
-            == """Player 2: 2 points
-Player 1: 1 point"""
-        )
-
-    def test_successful_guess(self):
-        wordlist = Wordlist(["hat", "cat", "eat", "teat"])
-        letters = "hatcatea"
-        game = Game(letters=letters, wordlist=wordlist)
-        correct_guess = "hat"
-        assert game.make_guess(1, "Player 1", correct_guess) == (
-            "hat",
-            Game.word_score(correct_guess),
-        )
-
-    def test_successful_guess_normalises_word(self):
-        wordlist = Wordlist(["hat"])
-        letters = "hats"
-        game = Game(letters=letters, wordlist=wordlist)
-        correct_guess = "hats"
-        assert game.make_guess(1, "Player 1", correct_guess) == (
-            "hat",
-            Game.word_score(correct_guess),
-        )
-
+    @random_seed(1)
     def test_get_hint(self):
         game = Game(
             letters="hcatlongword",
             wordlist=Wordlist(["hat", "cat", "longword"]),
             common_words=frozenset(["hat"]),
         )
-        random.seed(1)
         assert game.get_hint() == "l o n g _ _ _ _"
-
-    def test_unsuccessful_guess(self):
-        wordlist = Wordlist(["hat", "cat", "eat", "teat"])
-        letters = "hatcatea"
-        game = Game(letters=letters, wordlist=wordlist)
-        wrong_guess = "ttt"
-        assert game.make_guess(1, "Player 1", wrong_guess) is None
-
-    def test_longest_remaining_words(self):
-        wordlist = Wordlist(["hat", "cat", "predator", "conversation"])
-        letters = "hatcatpredatorconversation"
-        game = Game(letters=letters, wordlist=wordlist)
-        game.make_guess(1, "Player 1", "hat")
-        assert game.longest_remaining_words() == ["conversation", "predator", "cat"]
