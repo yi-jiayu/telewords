@@ -21,4 +21,4 @@ jobs:
         pipenv run python -m nltk.downloader wordnet
     - name: Test with pytest
       run: |
-        pipenv run python -m pytest
+        make test
