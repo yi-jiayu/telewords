@@ -5,6 +5,7 @@ from operator import itemgetter
 from more_itertools import grouper
 from nltk.corpus import wordnet as wn
 
+from dictionary import get_definition
 from letters import (
     get_letters,
     default_wordlist,
@@ -12,7 +13,7 @@ from letters import (
     redact_letters,
 )
 
-states = {}
+MIN_HINT_LENGTH = 7
 
 
 class Game:
@@ -30,7 +31,12 @@ class Game:
         self.remaining_rounds = num_rounds
 
     def start(self):
-        yield f"<pre>{self.format_grid()}</pre>\n\n<em>Hint: {self.get_hint()}</em>", "HTML"
+        yield self._grid_message()
+
+    def stop(self):
+        if self.scores:
+            yield self._final_scores_message()
+        yield from self._missed_words_message()
 
     def guess(self, id, name, guess):
         guess = wn.morphy(guess.lower())
@@ -42,8 +48,36 @@ class Game:
             self.players[id] = name
             self.words.remove(guess)
             self.remaining_rounds -= 1
-            yield f'{name} guessed "{guess}" for {score} {"point" if score == 1 else "points"}!\n\n*Current scores*\n{self.format_scores()}', "Markdown"
-            yield f"<pre>{self.format_grid()}</pre>\n\n<em>Hint: {self.get_hint()}</em>", "HTML"
+            yield self._correct_guess_message(guess, name, score)
+            if self.remaining_rounds > 0:
+                yield self._grid_message()
+
+    def _final_scores_message(self):
+        return f"*Final scores*\n{self.format_scores()}", "Markdown"
+
+    def _correct_guess_message(self, guess, name, score):
+        return (
+            f"""{name} guessed "{guess}" for {score} {"point" if score == 1 else "points"}!
+
+*Current scores*
+{self.format_scores()}""",
+            "Markdown",
+        )
+
+    def _remaining_rounds_message(self):
+        if self.remaining_rounds == 1:
+            return "Last round!"
+        else:
+            return f"{self.remaining_rounds} rounds remaining!"
+
+    def _grid_message(self):
+        return (
+            f"""<pre>{self.format_grid()}</pre>
+<em>Hint: {self.get_hint()}</em>
+
+{self._remaining_rounds_message()}""",
+            "HTML",
+        )
 
     def is_finished(self):
         return self.remaining_rounds <= 0
@@ -63,13 +97,15 @@ class Game:
             for user_id, score in sorted_player_scores
         )
 
-    def longest_remaining_words(self, n=5):
+    def _longest_remaining_words(self, n=5):
         return sorted(self.words, key=len, reverse=True)[:n]
 
     def get_hint(self):
         uncommon_words = self.words - self.common_words
         hint = redact_letters(
-            random.choice([word for word in uncommon_words if len(word) > 7])
+            random.choice(
+                [word for word in uncommon_words if len(word) > MIN_HINT_LENGTH]
+            )
         )
         return " ".join(hint)
 
@@ -85,7 +121,14 @@ class Game:
         else:
             return 9
 
-
-def start_game(chat_id):
-    states[chat_id] = Game(chat_id)
-    return states[chat_id]
+    def _missed_words_message(self):
+        remaining_words = self._longest_remaining_words()
+        if not remaining_words:
+            return
+        message = "Here are some words you missed:"
+        for word in remaining_words:
+            definition = get_definition(word)
+            if definition:
+                word += "\n" + definition
+            message += "\n\n" + word
+        yield message, None

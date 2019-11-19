@@ -6,7 +6,6 @@ import httpx
 import sanic.response
 from sanic import Sanic
 
-from dictionary import get_definition
 from game import Game
 
 app = Sanic()
@@ -34,10 +33,10 @@ async def handle_text(update, text):
     elif chat_id in games:
         name = update["message"]["from"]["first_name"]
         user_id = update["message"]["from"]["id"]
-        await guess(chat_id, user_id, name, text)
+        await make_guess(chat_id, user_id, name, text)
 
 
-async def guess(chat_id, user_id, name, text: str):
+async def make_guess(chat_id, user_id, name, text: str):
     game = games[chat_id]
     replies = (
         send_message(chat_id, text, parse_mode)
@@ -73,9 +72,10 @@ async def stop_game(chat_id):
     if chat_id in games:
         game = games[chat_id]
         del games[chat_id]
-        if game.scores:
-            await send_message(chat_id, f"*Final scores*\n\n" + game.format_scores())
-        await report_remaining_words(chat_id, game)
+        replies = (
+            send_message(chat_id, text, parse_mode) for text, parse_mode in game.stop()
+        )
+        await gather(*replies)
 
 
 async def send_message(chat_id, text, parse_mode="Markdown"):
@@ -88,19 +88,6 @@ async def send_message(chat_id, text, parse_mode="Markdown"):
     await make_telegram_request(
         "sendMessage", params,
     )
-
-
-async def report_remaining_words(chat_id, game):
-    remaining_words = game.longest_remaining_words()
-    if not remaining_words:
-        return
-    text = "Here are some words you missed:"
-    for word in remaining_words:
-        definition = get_definition(word)
-        if definition:
-            word += "\n" + definition
-        text += "\n\n" + word
-    await send_message(chat_id, text)
 
 
 async def make_telegram_request(method, params):
