@@ -60,12 +60,6 @@ async def send_hint(chat_id):
         )
 
 
-async def show_scores(chat_id):
-    if chat_id in games:
-        game = games[chat_id]
-        await send_message(chat_id, game.format_scores())
-
-
 async def start_game(chat_id):
     game = Game()
     games[chat_id] = game
@@ -73,20 +67,6 @@ async def start_game(chat_id):
         send_message(chat_id, text, parse_mode) for text, parse_mode in game.start()
     )
     await gather(*replies)
-
-
-async def send_grid(chat_id, game):
-    if game.remaining_rounds == 1:
-        message = "Last round!"
-    elif game.remaining_rounds == 0:
-        message = "Game over!"
-    else:
-        message = f"{game.remaining_rounds} rounds remaining!"
-    if game.remaining_rounds > 0:
-        message += "\n\n" + f"<em>Hint: {game.get_hint()}</em>"
-    await send_message(
-        chat_id, f"<pre>{game.format_grid()}</pre>" + "\n" + message, parse_mode="HTML"
-    )
 
 
 async def stop_game(chat_id):
