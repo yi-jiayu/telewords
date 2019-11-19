@@ -18,8 +18,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install pipenv
         pipenv install --dev
-        pipenv run python -m nltk.downloader
+        pipenv run python -m nltk.downloader wordnet
     - name: Test with pytest
       run: |
-        pip install pytest
         pipenv run python -m pytest
