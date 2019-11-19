@@ -14,7 +14,7 @@ from letters import (
 )
 
 MIN_HINT_LENGTH = 7
-DEFAULT_GAME_LENGTH = 15
+DEFAULT_GAME_LENGTH = 30
 
 SCRABBLE_LETTER_SCORES = {
     1: "eaionrtlsu",
