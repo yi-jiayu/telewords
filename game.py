@@ -32,6 +32,7 @@ class Game:
         self.common_words = (
             default_common_words if common_words is None else common_words
         )
+        self.guesses = {}
         self.scores = defaultdict(lambda: 0)
         self.players = {}
         self.remaining_rounds = num_rounds
@@ -48,12 +49,17 @@ class Game:
         guess = wn.morphy(guess.lower())
         if guess is None:
             return
-        if guess in self.words:
+        if guess in self.guesses:
+            guesser_id = self.guesses[guess]
+            guesser_name = self.players[guesser_id]
+            yield f'{guesser_name} already guessed "{guess}"!', None
+        elif guess in self.words:
             score = Game.word_score(guess)
             self.scores[id] += score
             self.players[id] = name
             self.words.remove(guess)
             self.remaining_rounds -= 1
+            self.guesses[guess] = id
             yield self._correct_guess_message(guess, name, score)
             if self.remaining_rounds > 0:
                 yield self._grid_message()

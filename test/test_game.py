@@ -16,13 +16,13 @@ R  E  U  T  A
 A  N  U  I  E</pre>
 <em>Hint: _ r o _ i n a _ _</em>
 
-30 rounds remaining!""",
+15 rounds remaining!""",
                 "HTML",
             )
         ]
 
     @random_seed(1)
-    def test_correct_guesses(self):
+    def test_guesses(self):
         game = Game()
         list(game.start())
         assert list(game.guess(1, "Player 1", "locus")) == [
@@ -41,7 +41,7 @@ R  E  U  T  A
 A  N  U  I  E</pre>
 <em>Hint: c o _ _ s e _ _ _ s</em>
 
-29 rounds remaining!""",
+14 rounds remaining!""",
                 "HTML",
             ),
         ]
@@ -66,9 +66,12 @@ R  E  U  T  A
 A  N  U  I  E</pre>
 <em>Hint: _ _ _ _ n i s e</em>
 
-28 rounds remaining!""",
+13 rounds remaining!""",
                 "HTML",
             ),
+        ]
+        assert list(game.guess(1, "Player 1", "trackable")) == [
+            ('Player 2 already guessed "trackable"!', None)
         ]
 
     @random_seed(1)
