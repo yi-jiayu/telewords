@@ -16,15 +16,29 @@ from letters import (
 MIN_HINT_LENGTH = 7
 DEFAULT_GAME_LENGTH = 15
 
+SCRABBLE_LETTER_SCORES = {
+    1: "eaionrtlsu",
+    2: "dg",
+    3: "bcmp",
+    4: "fhvwy",
+    5: "k",
+    8: "jx",
+    10: "qz",
+}
+LETTER_SCORES = {}
+for score, letters in SCRABBLE_LETTER_SCORES.items():
+    for letter in letters:
+        LETTER_SCORES[letter] = score
+
 
 class Game:
     def __init__(
-        self,
-        k=25,
-        letters=None,
-        wordlist=None,
-        common_words=None,
-        num_rounds=DEFAULT_GAME_LENGTH,
+            self,
+            k=25,
+            letters=None,
+            wordlist=None,
+            common_words=None,
+            num_rounds=DEFAULT_GAME_LENGTH,
     ):
         self.letters = get_letters(k) if letters is None else letters
         wordlist = default_wordlist if wordlist is None else wordlist
@@ -128,15 +142,7 @@ class Game:
 
     @staticmethod
     def word_score(word):
-        length = len(word)
-        if length <= 5:
-            return 1
-        elif length <= 7:
-            return 2
-        elif length <= 11:
-            return 4
-        else:
-            return 9
+        return sum(LETTER_SCORES[l] for l in word)
 
     def _missed_words_message(self):
         remaining_words = self._longest_remaining_words()

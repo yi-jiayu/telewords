@@ -1,4 +1,4 @@
-from game import Game
+from game import Game, DEFAULT_GAME_LENGTH
 from helpers import random_seed
 from letters import Wordlist
 
@@ -9,14 +9,14 @@ class TestGame:
         game = Game()
         assert list(game.start()) == [
             (
-                """<pre>C  S  R  E  L
+                f"""<pre>C  S  R  E  L
 L  O  S  B  A
 S  I  R  A  K
 R  E  U  T  A
 A  N  U  I  E</pre>
 <em>Hint: _ r o _ i n a _ _</em>
 
-15 rounds remaining!""",
+{DEFAULT_GAME_LENGTH} rounds remaining!""",
                 "HTML",
             )
         ]
@@ -27,46 +27,46 @@ A  N  U  I  E</pre>
         list(game.start())
         assert list(game.guess(1, "Player 1", "locus")) == [
             (
-                """Player 1 guessed "locus" for 1 point!
+                """Player 1 guessed "locus" for 7 points!
 
 *Current scores*
-Player 1: 1 point""",
+Player 1: 7 points""",
                 "Markdown",
             ),
             (
-                """<pre>C  S  R  E  L
+                f"""<pre>C  S  R  E  L
 L  O  S  B  A
 S  I  R  A  K
 R  E  U  T  A
 A  N  U  I  E</pre>
 <em>Hint: c o _ _ s e _ _ _ s</em>
 
-14 rounds remaining!""",
+{DEFAULT_GAME_LENGTH - 1} rounds remaining!""",
                 "HTML",
             ),
         ]
         assert list(game.guess(1, "Player 1", "wrong guess")) == []
         assert list(game.guess(2, "Player 2", "trackable")) == [
             (
-                """Player 2 guessed "trackable" for 4 points!
+                """Player 2 guessed "trackable" for 17 points!
 
 Trackable means:
 (a) capable of being traced or tracked
 
 *Current scores*
-Player 2: 4 points
-Player 1: 1 point""",
+Player 2: 17 points
+Player 1: 7 points""",
                 "Markdown",
             ),
             (
-                """<pre>C  S  R  E  L
+                f"""<pre>C  S  R  E  L
 L  O  S  B  A
 S  I  R  A  K
 R  E  U  T  A
 A  N  U  I  E</pre>
 <em>Hint: _ _ _ _ n i s e</em>
 
-13 rounds remaining!""",
+{DEFAULT_GAME_LENGTH - 2} rounds remaining!""",
                 "HTML",
             ),
         ]
@@ -79,10 +79,10 @@ A  N  U  I  E</pre>
         game = Game(num_rounds=2)
         assert list(game.guess(1, "Player 1", "locus")) == [
             (
-                """Player 1 guessed "locus" for 1 point!
+                """Player 1 guessed "locus" for 7 points!
 
 *Current scores*
-Player 1: 1 point""",
+Player 1: 7 points""",
                 "Markdown",
             ),
             (
@@ -99,14 +99,14 @@ Last round!""",
         ]
         assert list(game.guess(2, "Player 2", "trackable")) == [
             (
-                """Player 2 guessed "trackable" for 4 points!
+                """Player 2 guessed "trackable" for 17 points!
 
 Trackable means:
 (a) capable of being traced or tracked
 
 *Current scores*
-Player 2: 4 points
-Player 1: 1 point""",
+Player 2: 17 points
+Player 1: 7 points""",
                 "Markdown",
             ),
         ]
@@ -119,8 +119,8 @@ Player 1: 1 point""",
         assert list(game.stop()) == [
             (
                 """*Final scores*
-Player 2: 9 points
-Player 1: 1 point""",
+Player 2: 20 points
+Player 1: 7 points""",
                 "Markdown",
             ),
             (
