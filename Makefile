@@ -1,4 +1,4 @@
-.PHONY: test format start
+.PHONY: test format start coverage
 
 test:
 	PYTHONHASHSEED=0 pipenv run python -m pytest -vv
@@ -8,3 +8,6 @@ format:
 
 start:
 	pipenv run python server.py
+
+coverage:
+	PYTHONHASHSEED=0 pipenv run python -m pytest --cov
