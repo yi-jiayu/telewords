@@ -1,5 +1,5 @@
 from game import Game, DEFAULT_GAME_LENGTH
-from helpers import random_seed
+from helpers import random_seed, regex_matcher
 from letters import Wordlist
 
 
@@ -9,14 +9,16 @@ class TestGame:
         game = Game()
         assert list(game.start()) == [
             (
-                f"""<pre>C  S  R  E  L
+                regex_matcher(
+                    f"""<pre>C  S  R  E  L
 L  O  S  B  A
 S  I  R  A  K
 R  E  U  T  A
 A  N  U  I  E</pre>
-<em>Hint: _ r o _ i n a _ _</em>
+<em>Hint: [a-z_ ]+</em>
 
-{DEFAULT_GAME_LENGTH} rounds remaining!""",
+{DEFAULT_GAME_LENGTH} rounds remaining!"""
+                ),
                 "HTML",
             )
         ]
@@ -34,14 +36,16 @@ Player 1: 7 points""",
                 "Markdown",
             ),
             (
-                f"""<pre>C  S  R  E  L
+                regex_matcher(
+                    f"""<pre>C  S  R  E  L
 L  O  S  B  A
 S  I  R  A  K
 R  E  U  T  A
 A  N  U  I  E</pre>
-<em>Hint: c o _ _ s e _ _ _ s</em>
+<em>Hint: [a-z_ ]+</em>
 
-{DEFAULT_GAME_LENGTH - 1} rounds remaining!""",
+{DEFAULT_GAME_LENGTH - 1} rounds remaining!"""
+                ),
                 "HTML",
             ),
         ]
@@ -59,14 +63,16 @@ Player 1: 7 points""",
                 "Markdown",
             ),
             (
-                f"""<pre>C  S  R  E  L
+                regex_matcher(
+                    f"""<pre>C  S  R  E  L
 L  O  S  B  A
 S  I  R  A  K
 R  E  U  T  A
 A  N  U  I  E</pre>
-<em>Hint: _ _ _ _ n i s e</em>
+<em>Hint: [a-z_ ]+</em>
 
-{DEFAULT_GAME_LENGTH - 2} rounds remaining!""",
+{DEFAULT_GAME_LENGTH - 2} rounds remaining!"""
+                ),
                 "HTML",
             ),
         ]
@@ -86,14 +92,16 @@ Player 1: 7 points""",
                 "Markdown",
             ),
             (
-                """<pre>C  S  R  E  L
+                regex_matcher(
+                    """<pre>C  S  R  E  L
 L  O  S  B  A
 S  I  R  A  K
 R  E  U  T  A
 A  N  U  I  E</pre>
-<em>Hint: _ r o _ i n a _ _</em>
+<em>Hint: [a-z_ ]+</em>
 
-Last round!""",
+Last round!"""
+                ),
                 "HTML",
             ),
         ]
