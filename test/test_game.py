@@ -132,25 +132,9 @@ Player 1: 7 points""",
                 "Markdown",
             ),
             (
-                """Here are some words you missed:
-
-auriculariales
-(n) coextensive with the family Auriculariaceae; sometimes included in the order Tremellales
-
-irresoluteness
-(n) the trait of being irresolute; lacking firmness of purpose
-
-secularisation
-(n) the activity of changing something (art or education or society or morality etc.) so it is no longer under the control or influence of religion
-(n) transfer of property from ecclesiastical to civil possession
-
-rebelliousness
-(n) intentionally contemptuous behavior or attitude
-(n) an insubordinate act
-
-subterraneous
-(s) being or operating under the surface of the earth
-(s) lying beyond what is openly revealed or avowed (especially being kept in the background or deliberately concealed); ; - Bertrand Russell""",
+                regex_matcher(
+                    r"Here are some words you missed:\n\n([a-z]+\n(\([ansv]\) .+\n?)+\n?)"
+                ),
                 None,
             ),
         ]
@@ -160,24 +144,9 @@ subterraneous
         game = Game()
         assert list(game.stop()) == [
             (
-                """Here are some words you missed:
-
-lentibulariaceae
-(n) carnivorous aquatic or bog plants: genera Utricularia, Pinguicula, and Genlisea
-
-auriculariales
-(n) coextensive with the family Auriculariaceae; sometimes included in the order Tremellales
-
-irresoluteness
-(n) the trait of being irresolute; lacking firmness of purpose
-
-secularisation
-(n) the activity of changing something (art or education or society or morality etc.) so it is no longer under the control or influence of religion
-(n) transfer of property from ecclesiastical to civil possession
-
-rebelliousness
-(n) intentionally contemptuous behavior or attitude
-(n) an insubordinate act""",
+                regex_matcher(
+                    r"Here are some words you missed:\n\n([a-z]+\n(\([ansv]\) .+\n?)+\n?)"
+                ),
                 None,
             )
         ]
