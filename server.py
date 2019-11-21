@@ -38,11 +38,7 @@ async def handle_text(update, text):
 
 async def make_guess(chat_id, user_id, name, text: str):
     game = games[chat_id]
-    replies = (
-        send_message(chat_id, text, parse_mode)
-        for text, parse_mode in game.guess(user_id, name, text)
-    )
-    await gather(*replies)
+    await transduce(chat_id, game.guess(user_id, name, text))
     if game.is_finished():
         await stop_game(chat_id)
 
@@ -70,20 +66,14 @@ async def start_game(chat_id, text):
             pass
     game = Game(**kwargs)
     games[chat_id] = game
-    replies = (
-        send_message(chat_id, text, parse_mode) for text, parse_mode in game.start()
-    )
-    await gather(*replies)
+    await transduce(chat_id, game.start())
 
 
 async def stop_game(chat_id):
     if chat_id in games:
         game = games[chat_id]
         del games[chat_id]
-        replies = (
-            send_message(chat_id, text, parse_mode) for text, parse_mode in game.stop()
-        )
-        await gather(*replies)
+        await transduce(chat_id, game.stop())
 
 
 async def send_message(chat_id, text, parse_mode="Markdown"):
@@ -104,6 +94,13 @@ async def make_telegram_request(method, params):
         r = await client.post(url, data=params)
     if not 200 <= r.status_code < 400:
         logging.error(r.text)
+
+
+async def transduce(chat_id, messages):
+    replies = (
+        send_message(chat_id, text, parse_mode) for text, parse_mode in messages
+    )
+    await gather(*replies)
 
 
 if __name__ == "__main__":
