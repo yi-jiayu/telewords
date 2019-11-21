@@ -10,6 +10,7 @@ from game import Game
 
 app = Sanic()
 bot_token = getenv("TELEGRAM_BOT_TOKEN")
+bot_name = getenv("TELEGRAM_BOT_USERNAME")
 games = {}
 
 
@@ -24,9 +25,9 @@ async def handle(request):
 
 async def handle_text(update, text):
     chat_id = update["message"]["chat"]["id"]
-    if text.startswith("/start"):
+    if "start" in text and bot_name in text:
         await start_game(chat_id, text)
-    elif text.startswith("/stop"):
+    elif "stop" in text and bot_name in text:
         await stop_game(chat_id)
     elif text.startswith("/hint"):
         await send_hint(chat_id)
@@ -97,9 +98,7 @@ async def make_telegram_request(method, params):
 
 
 async def transduce(chat_id, messages):
-    replies = (
-        send_message(chat_id, text, parse_mode) for text, parse_mode in messages
-    )
+    replies = (send_message(chat_id, text, parse_mode) for text, parse_mode in messages)
     await gather(*replies)
 
 
