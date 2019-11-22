@@ -52,7 +52,8 @@ async def send_hint(chat_id):
         )
     else:
         await send_message(
-            chat_id, "No game in progress! You can start a new game with /start."
+            chat_id,
+            f'No game in progress! You can start a new game by saying "start" and tagging {bot_name}.',
         )
 
 
