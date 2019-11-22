@@ -25,7 +25,7 @@ async def handle(request):
 
 async def handle_text(update, text):
     chat_id = update["message"]["chat"]["id"]
-    if "start" in text and bot_name in text:
+    if "start" in text and (chat_id > 0 or bot_name.lower() in text.lower()):
         await start_game(chat_id, text)
     elif "stop" in text and bot_name in text:
         await stop_game(chat_id)
