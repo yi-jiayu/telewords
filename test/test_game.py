@@ -1,6 +1,5 @@
 from game import Game, DEFAULT_GAME_LENGTH
 from helpers import random_seed, regex_matcher
-from letters import Wordlist
 
 
 class TestGame:
@@ -15,12 +14,12 @@ L  O  S  B  A
 S  I  R  A  K
 R  E  U  T  A
 A  N  U  I  E</pre>
-<em>Hint: [a-z_ ]+</em>
 
 {DEFAULT_GAME_LENGTH} rounds remaining!"""
                 ),
                 "HTML",
-            )
+            ),
+            (regex_matcher(r"<em>Hint: [a-z_ ]+<\/em>\n\n(\([ansv]\) .+\n?)+"), "HTML"),
         ]
 
     @random_seed(1)
@@ -42,12 +41,12 @@ L  O  S  B  A
 S  I  R  A  K
 R  E  U  T  A
 A  N  U  I  E</pre>
-<em>Hint: [a-z_ ]+</em>
 
 {DEFAULT_GAME_LENGTH - 1} rounds remaining!"""
                 ),
                 "HTML",
             ),
+            (regex_matcher(r"<em>Hint: [a-z_ ]+<\/em>\n\n(\([ansv]\) .+\n?)+"), "HTML"),
         ]
         assert list(game.guess(1, "Player 1", "wrong guess")) == []
         assert list(game.guess(2, "Player 2", "trackable")) == [
@@ -69,12 +68,12 @@ L  O  S  B  A
 S  I  R  A  K
 R  E  U  T  A
 A  N  U  I  E</pre>
-<em>Hint: [a-z_ ]+</em>
 
 {DEFAULT_GAME_LENGTH - 2} rounds remaining!"""
                 ),
                 "HTML",
             ),
+            (regex_matcher(r"<em>Hint: [a-z_ ]+<\/em>\n\n(\([ansv]\) .+\n?)+"), "HTML"),
         ]
         assert list(game.guess(1, "Player 1", "trackable")) == [
             ('Player 2 already guessed "trackable"!', None)
@@ -98,12 +97,12 @@ L  O  S  B  A
 S  I  R  A  K
 R  E  U  T  A
 A  N  U  I  E</pre>
-<em>Hint: [a-z_ ]+</em>
 
 Last round!"""
                 ),
                 "HTML",
             ),
+            (regex_matcher(r"<em>Hint: [a-z_ ]+<\/em>\n\n(\([ansv]\) .+\n?)+"), "HTML"),
         ]
         assert list(game.guess(2, "Player 2", "trackable")) == [
             (
@@ -161,12 +160,3 @@ K  L  M  N  O
 P  Q  R  S  T
 U  V  W  X  Y"""
         )
-
-    @random_seed(1)
-    def test_get_hint(self):
-        game = Game(
-            letters="hcatlongword",
-            wordlist=Wordlist(["hat", "cat", "longword"]),
-            common_words=frozenset(["hat"]),
-        )
-        assert game.get_hint() == "l o n g _ _ _ _"

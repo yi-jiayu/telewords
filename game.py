@@ -14,6 +14,7 @@ from letters import (
 )
 
 DEFAULT_GAME_LENGTH = 30
+HINT_REDACTION_AMOUNT = 0.4
 
 SCRABBLE_LETTER_SCORES = {
     1: "eaionrtlsu",
@@ -52,6 +53,7 @@ class Game:
 
     def start(self):
         yield self._grid_message()
+        yield self._hint_message()
 
     def stop(self):
         if self.scores:
@@ -76,14 +78,17 @@ class Game:
             yield self._correct_guess_message(guess, name, score)
             if self.remaining_rounds > 0:
                 yield self._grid_message()
+                yield self._hint_message()
 
     def is_finished(self):
         return self.remaining_rounds <= 0
 
-    def get_hint(self):
+    def _hint_message(self):
         uncommon_words = self.words - self.common_words
-        hint = redact_letters(random.choice([word for word in uncommon_words]))
-        return " ".join(hint)
+        hint = random.choice([word for word in uncommon_words])
+        hint_text = " ".join(redact_letters(hint, HINT_REDACTION_AMOUNT))
+        hint_definition = get_definition(hint)
+        return f"<em>Hint: {hint_text}</em>\n\n{hint_definition}", "HTML"
 
     def _final_scores_message(self):
         return f"*Final scores*\n{self._format_scores()}", "Markdown"
@@ -111,7 +116,6 @@ class Game:
     def _grid_message(self):
         return (
             f"""<pre>{self._format_grid()}</pre>
-<em>Hint: {self.get_hint()}</em>
 
 {self._remaining_rounds_message()}""",
             "HTML",

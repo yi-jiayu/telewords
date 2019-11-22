@@ -29,8 +29,6 @@ async def handle_text(update, text):
         await start_game(chat_id, text)
     elif "stop" in text and bot_name in text:
         await stop_game(chat_id)
-    elif text.startswith("/hint"):
-        await send_hint(chat_id)
     elif chat_id in games:
         name = update["message"]["from"]["first_name"]
         user_id = update["message"]["from"]["id"]
@@ -42,19 +40,6 @@ async def make_guess(chat_id, user_id, name, text: str):
     await transduce(chat_id, game.guess(user_id, name, text))
     if game.is_finished():
         await stop_game(chat_id)
-
-
-async def send_hint(chat_id):
-    if chat_id in games:
-        game = games[chat_id]
-        await send_message(
-            chat_id, f"<em>Hint: {game.get_hint()}</em>", parse_mode="HTML"
-        )
-    else:
-        await send_message(
-            chat_id,
-            f'No game in progress! You can start a new game by saying "start" and tagging {bot_name}.',
-        )
 
 
 async def start_game(chat_id, text):
