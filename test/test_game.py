@@ -9,17 +9,18 @@ class TestGame:
         assert list(game.start()) == [
             (
                 regex_matcher(
-                    f"""<pre>[A-Z]  [A-Z]  [A-Z]  [A-Z]  [A-Z]
+                    fr"""<pre>[A-Z]  [A-Z]  [A-Z]  [A-Z]  [A-Z]
 [A-Z]  [A-Z]  [A-Z]  [A-Z]  [A-Z]
 [A-Z]  [A-Z]  [A-Z]  [A-Z]  [A-Z]
 [A-Z]  [A-Z]  [A-Z]  [A-Z]  [A-Z]
 [A-Z]  [A-Z]  [A-Z]  [A-Z]  [A-Z]</pre>
 
-{DEFAULT_GAME_LENGTH} rounds remaining!"""
+{DEFAULT_GAME_LENGTH} rounds remaining!
+
+<em>Hint: [a-z_ ]+<\/em>\n\([ansv]\) [^\n]+"""
                 ),
                 "HTML",
             ),
-            (regex_matcher(r"<em>Hint: [a-z_ ]+<\/em>\n\([ansv]\) [^\n]+"), "HTML"),
         ]
 
     @random_seed(1)
@@ -36,17 +37,18 @@ Player 1: 7 points""",
             ),
             (
                 regex_matcher(
-                    f"""<pre>C  S  R  E  L
+                    fr"""<pre>C  S  R  E  L
 L  O  S  B  A
 S  I  R  A  K
 R  E  U  T  A
 A  N  U  I  E</pre>
 
-{DEFAULT_GAME_LENGTH - 1} rounds remaining!"""
+{DEFAULT_GAME_LENGTH - 1} rounds remaining!
+
+<em>Hint: [a-z_ ]+<\/em>\n\([ansv]\) [^\n]+"""
                 ),
                 "HTML",
             ),
-            (regex_matcher(r"<em>Hint: [a-z_ ]+<\/em>\n\([ansv]\) [^\n]+"), "HTML"),
         ]
         assert list(game.guess(1, "Player 1", "wrong guess")) == []
         assert list(game.guess(2, "Player 2", "trackable")) == [
@@ -63,17 +65,18 @@ Player 1: 7 points""",
             ),
             (
                 regex_matcher(
-                    f"""<pre>C  S  R  E  L
+                    fr"""<pre>C  S  R  E  L
 L  O  S  B  A
 S  I  R  A  K
 R  E  U  T  A
 A  N  U  I  E</pre>
 
-{DEFAULT_GAME_LENGTH - 2} rounds remaining!"""
+{DEFAULT_GAME_LENGTH - 2} rounds remaining!
+
+<em>Hint: [a-z_ ]+<\/em>\n\([ansv]\) [^\n]+"""
                 ),
                 "HTML",
             ),
-            (regex_matcher(r"<em>Hint: [a-z_ ]+<\/em>\n\([ansv]\) [^\n]+"), "HTML"),
         ]
         assert list(game.guess(1, "Player 1", "trackable")) == [
             ('Player 2 already guessed "trackable"!', None)
@@ -92,17 +95,18 @@ Player 1: 7 points""",
             ),
             (
                 regex_matcher(
-                    """<pre>C  S  R  E  L
+                    r"""<pre>C  S  R  E  L
 L  O  S  B  A
 S  I  R  A  K
 R  E  U  T  A
 A  N  U  I  E</pre>
 
-Last round!"""
+Last round!
+
+<em>Hint: [a-z_ ]+<\/em>\n\([ansv]\) [^\n]+"""
                 ),
                 "HTML",
             ),
-            (regex_matcher(r"<em>Hint: [a-z_ ]+<\/em>\n\([ansv]\) [^\n]+"), "HTML"),
         ]
         assert list(game.guess(2, "Player 2", "trackable")) == [
             (
