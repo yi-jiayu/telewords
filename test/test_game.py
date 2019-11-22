@@ -15,9 +15,9 @@ class TestGame:
 [A-Z]  [A-Z]  [A-Z]  [A-Z]  [A-Z]
 [A-Z]  [A-Z]  [A-Z]  [A-Z]  [A-Z]</pre>
 
-{DEFAULT_GAME_LENGTH} rounds remaining!
+{DEFAULT_GAME_LENGTH} rounds remaining!(
 
-<em>Hint: [a-z_ ]+<\/em>\n\([ansv]\) [^\n]+"""
+<em>Hint: [a-z_ ]+<\/em>\n\([ansv]\) [^\n]+)?"""
                 ),
                 "HTML",
             ),
@@ -43,9 +43,9 @@ S  I  R  A  K
 R  E  U  T  A
 A  N  U  I  E</pre>
 
-{DEFAULT_GAME_LENGTH - 1} rounds remaining!
+{DEFAULT_GAME_LENGTH - 1} rounds remaining!(
 
-<em>Hint: [a-z_ ]+<\/em>\n\([ansv]\) [^\n]+"""
+<em>Hint: [a-z_ ]+<\/em>\n\([ansv]\) [^\n]+)?"""
                 ),
                 "HTML",
             ),
@@ -71,9 +71,9 @@ S  I  R  A  K
 R  E  U  T  A
 A  N  U  I  E</pre>
 
-{DEFAULT_GAME_LENGTH - 2} rounds remaining!
+{DEFAULT_GAME_LENGTH - 2} rounds remaining!(
 
-<em>Hint: [a-z_ ]+<\/em>\n\([ansv]\) [^\n]+"""
+<em>Hint: [a-z_ ]+<\/em>\n\([ansv]\) [^\n]+)?"""
                 ),
                 "HTML",
             ),
@@ -101,9 +101,9 @@ S  I  R  A  K
 R  E  U  T  A
 A  N  U  I  E</pre>
 
-Last round!
+Last round!(
 
-<em>Hint: [a-z_ ]+<\/em>\n\([ansv]\) [^\n]+"""
+<em>Hint: [a-z_ ]+<\/em>\n\([ansv]\) [^\n]+)?"""
                 ),
                 "HTML",
             ),

@@ -15,6 +15,7 @@ from letters import (
 
 DEFAULT_GAME_LENGTH = 30
 HINT_REDACTION_AMOUNT = 0.5
+HINT_CHANCE = 0.33
 
 SCRABBLE_LETTER_SCORES = {
     1: "eaionrtlsu",
@@ -121,12 +122,13 @@ class Game:
             return f"{self.remaining_rounds} rounds remaining!"
 
     def _grid_message(self):
+        message = f"""<pre>{self._format_grid()}</pre>
+
+{self._remaining_rounds_message()}"""
+        if random.random() <= HINT_CHANCE:
+            message += "\n" + self._hint_message()
         return (
-            f"""<pre>{self._format_grid()}</pre>
-
-{self._remaining_rounds_message()}
-
-{self._hint_message()}""",
+            message,
             "HTML",
         )
 
