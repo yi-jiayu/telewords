@@ -19,7 +19,7 @@ class TestGame:
                 ),
                 "HTML",
             ),
-            (regex_matcher(r"<em>Hint: [a-z_ ]+<\/em>\n\n\([ansv]\) [^\n]+"), "HTML"),
+            (regex_matcher(r"<em>Hint: [a-z_ ]+<\/em>\n\([ansv]\) [^\n]+"), "HTML"),
         ]
 
     @random_seed(1)
@@ -46,7 +46,7 @@ A  N  U  I  E</pre>
                 ),
                 "HTML",
             ),
-            (regex_matcher(r"<em>Hint: [a-z_ ]+<\/em>\n\n\([ansv]\) [^\n]+"), "HTML"),
+            (regex_matcher(r"<em>Hint: [a-z_ ]+<\/em>\n\([ansv]\) [^\n]+"), "HTML"),
         ]
         assert list(game.guess(1, "Player 1", "wrong guess")) == []
         assert list(game.guess(2, "Player 2", "trackable")) == [
@@ -73,7 +73,7 @@ A  N  U  I  E</pre>
                 ),
                 "HTML",
             ),
-            (regex_matcher(r"<em>Hint: [a-z_ ]+<\/em>\n\n\([ansv]\) [^\n]+"), "HTML"),
+            (regex_matcher(r"<em>Hint: [a-z_ ]+<\/em>\n\([ansv]\) [^\n]+"), "HTML"),
         ]
         assert list(game.guess(1, "Player 1", "trackable")) == [
             ('Player 2 already guessed "trackable"!', None)
@@ -102,7 +102,7 @@ Last round!"""
                 ),
                 "HTML",
             ),
-            (regex_matcher(r"<em>Hint: [a-z_ ]+<\/em>\n\n\([ansv]\) [^\n]+"), "HTML"),
+            (regex_matcher(r"<em>Hint: [a-z_ ]+<\/em>\n\([ansv]\) [^\n]+"), "HTML"),
         ]
         assert list(game.guess(2, "Player 2", "trackable")) == [
             (
@@ -153,8 +153,8 @@ Player 1: 7 points""",
     def test_format_grid(self):
         game = Game(letters="abcdefghijklmnopqrstuvwxy")
         assert (
-                game._format_grid()
-                == """A  B  C  D  E
+            game._format_grid()
+            == """A  B  C  D  E
 F  G  H  I  J
 K  L  M  N  O
 P  Q  R  S  T

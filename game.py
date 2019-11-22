@@ -33,12 +33,12 @@ for score, letters in SCRABBLE_LETTER_SCORES.items():
 
 class Game:
     def __init__(
-            self,
-            k=25,
-            letters=None,
-            wordlist=None,
-            common_words=None,
-            num_rounds=DEFAULT_GAME_LENGTH,
+        self,
+        k=25,
+        letters=None,
+        wordlist=None,
+        common_words=None,
+        num_rounds=DEFAULT_GAME_LENGTH,
     ):
         self.letters = get_letters(k) if letters is None else letters
         wordlist = default_wordlist if wordlist is None else wordlist
@@ -61,7 +61,7 @@ class Game:
         yield from self._missed_words_message()
 
     def guess(self, id, name, guess):
-        guess = wn.morphy(guess.lower())
+        guess = guess.lower()
         if guess is None:
             return
         if guess in self.guesses:
@@ -69,16 +69,23 @@ class Game:
             guesser_name = self.players[guesser_id]
             yield f'{guesser_name} already guessed "{guess}"!', None
         elif guess in self.words:
-            score = Game.word_score(guess)
-            self.scores[id] += score
-            self.players[id] = name
-            self.words.remove(guess)
-            self.remaining_rounds -= 1
-            self.guesses[guess] = id
-            yield self._correct_guess_message(guess, name, score)
-            if self.remaining_rounds > 0:
-                yield self._grid_message()
-                yield self._hint_message()
+            yield from self.register_guess(id, name, guess)
+        else:
+            guess = wn.morphy(guess)
+            if guess in self.words:
+                yield from self.register_guess(id, name, guess)
+
+    def register_guess(self, id, name, guess):
+        score = Game.word_score(guess)
+        self.scores[id] += score
+        self.players[id] = name
+        self.words.remove(guess)
+        self.remaining_rounds -= 1
+        self.guesses[guess] = id
+        yield self._correct_guess_message(guess, name, score)
+        if self.remaining_rounds > 0:
+            yield self._grid_message()
+            yield self._hint_message()
 
     def is_finished(self):
         return self.remaining_rounds <= 0
@@ -87,8 +94,8 @@ class Game:
         uncommon_words = self.words - self.common_words
         hint = random.choice([word for word in uncommon_words])
         hint_text = " ".join(redact_letters(hint, HINT_REDACTION_AMOUNT))
-        hint_definition = random.choice(get_definition(hint).split('\n'))
-        return f"<em>Hint: {hint_text}</em>\n\n{hint_definition}", "HTML"
+        hint_definition = random.choice(get_definition(hint).split("\n"))
+        return f"<em>Hint: {hint_text}</em>\n{hint_definition}", "HTML"
 
     def _final_scores_message(self):
         return f"*Final scores*\n{self._format_scores()}", "Markdown"
