@@ -81,6 +81,9 @@ class Game:
         if self.scores:
             yield self._final_scores_message()
         yield from self._missed_words_message()
+        for id, name in self.players.items():
+            set_player_name(id, name)
+        update_leaderboard_scores(self.id, self.scores)
 
     def guess(self, id, name, guess):
         guess = guess.lower()
@@ -187,3 +190,29 @@ class Game:
                 word += "\n" + definition
             message += "\n\n" + word
         yield message, None
+
+
+def set_player_name(id, name):
+    redis.set(f"player:{id}", name)
+
+
+def get_player_name(id):
+    data = redis.get(f"player:{id}")
+    if data is not None:
+        return data.decode()
+
+
+def update_leaderboard_scores(id, scores: dict):
+    for player_id, score in scores.items():
+        redis.hincrby(f"leaderboard:{id}", player_id, score)
+
+
+def get_leaderboard_scores(id):
+    data = redis.hgetall(f"leaderboard:{id}")
+    return {k.decode(): int(v.decode()) for k, v in data.items()}
+
+
+def format_scores(scores: dict):
+    return "\n".join(
+        f"{get_player_name(id)}: {score} points" for id, score in scores.items()
+    )

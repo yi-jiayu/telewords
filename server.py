@@ -6,7 +6,7 @@ import httpx
 import sanic.response
 from sanic import Sanic
 
-from game import Game
+from game import Game, get_leaderboard_scores, format_scores
 
 app = Sanic()
 bot_token = getenv("TELEGRAM_BOT_TOKEN")
@@ -70,6 +70,12 @@ async def stop_game(chat_id):
         return
     await transduce(chat_id, game.stop())
     game.delete()
+    await send_all_time_scores(chat_id)
+
+
+async def send_all_time_scores(chat_id):
+    scores = get_leaderboard_scores(chat_id)
+    await send_message(chat_id, f"*All-time scores*\n{format_scores(scores)}")
 
 
 async def send_message(chat_id, text, parse_mode="Markdown"):

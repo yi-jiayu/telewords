@@ -1,8 +1,19 @@
-from game import Game, DEFAULT_GAME_LENGTH
+from game import (
+    Game,
+    DEFAULT_GAME_LENGTH,
+    get_player_name,
+    redis,
+    get_leaderboard_scores,
+    format_scores,
+    set_player_name,
+)
 from helpers import random_seed, regex_matcher
 
 
 class TestGame:
+    def setup_method(self):
+        redis.flushdb()
+
     @random_seed(3)
     def test_game_start(self):
         game = Game("")
@@ -124,7 +135,7 @@ Player 1: 7 points""",
 
     @random_seed(1)
     def test_game_stop(self):
-        game = Game("")
+        game = Game("chat_id")
         list(game.guess(1, "Player 1", "locus"))
         list(game.guess(2, "Player 2", "lentibulariaceae"))
         assert list(game.stop()) == [
@@ -141,6 +152,9 @@ Player 1: 7 points""",
                 None,
             ),
         ]
+        assert get_player_name(1) == "Player 1"
+        assert get_player_name(2) == "Player 2"
+        assert get_leaderboard_scores("chat_id") == {"1": 7, "2": 20}
 
     @random_seed(1)
     def test_game_stop_without_participation(self):
@@ -172,3 +186,10 @@ U  V  W  X  Y"""
         loaded = Game.find(id)
         assert game.letters == loaded.letters
         assert game.words == loaded.words
+
+
+def test_format_scores():
+    set_player_name(1, "Player 1")
+    set_player_name(2, "Player 2")
+    scores = {1: 1, 2: 2}
+    assert format_scores(scores) == "Player 1: 1 points\nPlayer 2: 2 points"
