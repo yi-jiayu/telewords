@@ -10,7 +10,7 @@ jobs:
       redis:
         image: redis
         ports:
-          - 6379:6379
+          - 6379/tcp
         options: --entrypoint redis-server
 
     steps:
@@ -30,4 +30,4 @@ jobs:
         make test
       env:
         REDIS_HOST: redis
-        REDIS_PORT: ${{ job.services.redis.ports[6379] }}
+        REDIS_PORT: ${{ job.services.redis.ports['6379'] }}
