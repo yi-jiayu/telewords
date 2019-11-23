@@ -1,8 +1,11 @@
+import pickle
 import random
 from operator import itemgetter
+from typing import Optional
 
 from more_itertools import grouper
 from nltk.corpus import wordnet as wn
+from redis import Redis
 
 from dictionary import get_definition
 from letters import (
@@ -30,16 +33,20 @@ for score, letters in SCRABBLE_LETTER_SCORES.items():
     for letter in letters:
         LETTER_SCORES[letter] = score
 
+redis = Redis()
+
 
 class Game:
     def __init__(
         self,
+        id,
         k=25,
         letters=None,
         wordlist=None,
         common_words=None,
         num_rounds=DEFAULT_GAME_LENGTH,
     ):
+        self.id = id
         self.letters = get_letters(k) if letters is None else letters
         wordlist = default_wordlist if wordlist is None else wordlist
         self.words = wordlist.possible_words(self.letters)
@@ -50,6 +57,19 @@ class Game:
         self.scores = {}
         self.players = {}
         self.remaining_rounds = num_rounds
+
+    @classmethod
+    def find(cls, id) -> Optional["Game"]:
+        data = redis.get(f"game:{id}")
+        if data is not None:
+            return pickle.loads(data)
+
+    def save(self):
+        data = pickle.dumps(self)
+        redis.set(f"game:{self.id}", data)
+
+    def delete(self):
+        redis.delete(f"game:{self.id}")
 
     def start(self):
         yield self._grid_message()

@@ -27,19 +27,22 @@ async def handle_text(update, text):
     chat_id = update["message"]["chat"]["id"]
     if "start" in text and (chat_id > 0 or bot_name.lower() in text.lower()):
         await start_game(chat_id, text)
-    elif "stop" in text and bot_name in text:
+    elif "stop" in text and (chat_id > 0 or bot_name.lower() in text.lower()):
         await stop_game(chat_id)
-    elif chat_id in games:
-        name = update["message"]["from"]["first_name"]
-        user_id = update["message"]["from"]["id"]
-        await make_guess(chat_id, user_id, name, text)
+    else:
+        game = Game.find(chat_id)
+        if game:
+            name = update["message"]["from"]["first_name"]
+            user_id = update["message"]["from"]["id"]
+            await make_guess(game, chat_id, user_id, name, text)
 
 
-async def make_guess(chat_id, user_id, name, text: str):
-    game = games[chat_id]
+async def make_guess(game, chat_id, user_id, name, text: str):
     await transduce(chat_id, game.guess(user_id, name, text))
     if game.is_finished():
         await stop_game(chat_id)
+    else:
+        game.save()
 
 
 async def start_game(chat_id, text):
@@ -51,16 +54,22 @@ async def start_game(chat_id, text):
             kwargs["num_rounds"] = num_rounds
         except ValueError:
             pass
-    game = Game(**kwargs)
+    game = Game(chat_id, **kwargs)
     games[chat_id] = game
     await transduce(chat_id, game.start())
+    game.save()
 
 
 async def stop_game(chat_id):
-    if chat_id in games:
-        game = games[chat_id]
-        del games[chat_id]
-        await transduce(chat_id, game.stop())
+    game = Game.find(chat_id)
+    if game is None:
+        await send_message(
+            chat_id,
+            f"No game in progress! To start a new game, tag {bot_name} and say start!",
+        )
+        return
+    await transduce(chat_id, game.stop())
+    game.delete()
 
 
 async def send_message(chat_id, text, parse_mode="Markdown"):

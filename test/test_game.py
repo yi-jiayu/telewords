@@ -5,7 +5,7 @@ from helpers import random_seed, regex_matcher
 class TestGame:
     @random_seed(3)
     def test_game_start(self):
-        game = Game()
+        game = Game("")
         assert list(game.start()) == [
             (
                 regex_matcher(
@@ -25,7 +25,7 @@ class TestGame:
 
     @random_seed(1)
     def test_guesses(self):
-        game = Game()
+        game = Game("")
         list(game.start())
         assert list(game.guess(1, "Player 1", "locus")) == [
             (
@@ -84,7 +84,7 @@ A  N  U  I  E</pre>
 
     @random_seed(1)
     def test_last_round(self):
-        game = Game(num_rounds=2)
+        game = Game("", num_rounds=2)
         assert list(game.guess(1, "Player 1", "locus")) == [
             (
                 """Player 1 guessed "locus" for 7 points!
@@ -124,7 +124,7 @@ Player 1: 7 points""",
 
     @random_seed(1)
     def test_game_stop(self):
-        game = Game()
+        game = Game("")
         list(game.guess(1, "Player 1", "locus"))
         list(game.guess(2, "Player 2", "lentibulariaceae"))
         assert list(game.stop()) == [
@@ -144,7 +144,7 @@ Player 1: 7 points""",
 
     @random_seed(1)
     def test_game_stop_without_participation(self):
-        game = Game()
+        game = Game("")
         assert list(game.stop()) == [
             (
                 regex_matcher(
@@ -155,7 +155,7 @@ Player 1: 7 points""",
         ]
 
     def test_format_grid(self):
-        game = Game(letters="abcdefghijklmnopqrstuvwxy")
+        game = Game("", letters="abcdefghijklmnopqrstuvwxy")
         assert (
             game._format_grid()
             == """A  B  C  D  E
