@@ -1,3 +1,4 @@
+import os
 import pickle
 import random
 from operator import itemgetter
@@ -33,7 +34,9 @@ for score, letters in SCRABBLE_LETTER_SCORES.items():
     for letter in letters:
         LETTER_SCORES[letter] = score
 
-redis = Redis()
+redis = Redis(
+    os.getenv("REDIS_HOST", "localhost"), int(os.getenv("REDIS_PORT", "6379"))
+)
 
 
 class Game:

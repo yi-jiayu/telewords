@@ -164,3 +164,11 @@ K  L  M  N  O
 P  Q  R  S  T
 U  V  W  X  Y"""
         )
+
+    def test_save_load(self):
+        id = "game"
+        game = Game(id)
+        game.save()
+        loaded = Game.find(id)
+        assert game.letters == loaded.letters
+        assert game.words == loaded.words
