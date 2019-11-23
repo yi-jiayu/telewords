@@ -1,5 +1,4 @@
 import random
-from collections import defaultdict
 from operator import itemgetter
 
 from more_itertools import grouper
@@ -48,7 +47,7 @@ class Game:
             default_common_words if common_words is None else common_words
         )
         self.guesses = {}
-        self.scores = defaultdict(lambda: 0)
+        self.scores = {}
         self.players = {}
         self.remaining_rounds = num_rounds
 
@@ -77,7 +76,7 @@ class Game:
 
     def register_guess(self, id, name, guess):
         score = Game.word_score(guess)
-        self.scores[id] += score
+        self.scores[id] = self.scores.get(id, 0) + score
         self.players[id] = name
         self.words.remove(guess)
         self.remaining_rounds -= 1
