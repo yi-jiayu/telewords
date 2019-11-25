@@ -39,13 +39,16 @@ async def handle_text(update, text):
 
 async def make_guess(game, chat_id, user_id, name, text: str):
     messages = game.guess(user_id, name, text)
+    finished = False
     if game.is_finished():
+        finished = True
         messages.extend(game.stop())
         game.delete()
     else:
         game.save()
     await transduce(chat_id, messages)
-    await send_all_time_scores(chat_id)
+    if finished:
+        await send_all_time_scores(chat_id)
 
 
 async def start_game(chat_id, text):
