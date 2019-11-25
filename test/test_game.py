@@ -192,4 +192,4 @@ def test_format_scores():
     set_player_name(1, "Player 1")
     set_player_name(2, "Player 2")
     scores = {1: 1, 2: 2}
-    assert format_scores(scores) == "Player 1: 1 points\nPlayer 2: 2 points"
+    assert format_scores(scores) == "Player 2: 2 points\nPlayer 1: 1 points"

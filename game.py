@@ -222,6 +222,7 @@ def get_leaderboard_scores(id):
 
 
 def format_scores(scores: dict):
+    sorted_scores = sorted(scores.items(), key=itemgetter(1), reverse=True)
     return "\n".join(
-        f"{get_player_name(id)}: {score} points" for id, score in scores.items()
+        f"{get_player_name(id)}: {score} points" for id, score in sorted_scores
     )
