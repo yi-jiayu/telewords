@@ -38,11 +38,14 @@ async def handle_text(update, text):
 
 
 async def make_guess(game, chat_id, user_id, name, text: str):
-    await transduce(chat_id, game.guess(user_id, name, text))
+    messages = game.guess(user_id, name, text)
     if game.is_finished():
-        await stop_game(chat_id)
+        messages.extend(game.stop())
+        game.delete()
     else:
         game.save()
+    await transduce(chat_id, messages)
+    await send_all_time_scores(chat_id)
 
 
 async def start_game(chat_id, text):
@@ -56,8 +59,9 @@ async def start_game(chat_id, text):
             pass
     game = Game(chat_id, **kwargs)
     games[chat_id] = game
-    await transduce(chat_id, game.start())
+    messages = game.start()
     game.save()
+    await transduce(chat_id, messages)
 
 
 async def stop_game(chat_id):
@@ -68,8 +72,9 @@ async def stop_game(chat_id):
             f"No game in progress! To start a new game, tag {bot_name} and say start!",
         )
         return
-    await transduce(chat_id, game.stop())
+    messages = game.stop()
     game.delete()
+    await transduce(chat_id, messages)
     await send_all_time_scores(chat_id)
 
 

@@ -17,7 +17,7 @@ class TestGame:
     @random_seed(3)
     def test_game_start(self):
         game = Game("")
-        assert list(game.start()) == [
+        assert game.start() == [
             (
                 regex_matcher(
                     fr"""<pre>[A-Z]  [A-Z]  [A-Z]  [A-Z]  [A-Z]
@@ -37,8 +37,8 @@ class TestGame:
     @random_seed(1)
     def test_guesses(self):
         game = Game("")
-        list(game.start())
-        assert list(game.guess(1, "Player 1", "locus")) == [
+        game.start()
+        assert game.guess(1, "Player 1", "locus") == [
             (
                 """Player 1 guessed "locus" for 7 points!
 
@@ -61,8 +61,8 @@ A  N  U  I  E</pre>
                 "HTML",
             ),
         ]
-        assert list(game.guess(1, "Player 1", "wrong guess")) == []
-        assert list(game.guess(2, "Player 2", "trackable")) == [
+        assert game.guess(1, "Player 1", "wrong guess") == []
+        assert game.guess(2, "Player 2", "trackable") == [
             (
                 """Player 2 guessed "trackable" for 17 points!
 
@@ -89,14 +89,14 @@ A  N  U  I  E</pre>
                 "HTML",
             ),
         ]
-        assert list(game.guess(1, "Player 1", "trackable")) == [
+        assert game.guess(1, "Player 1", "trackable") == [
             ('Player 2 already guessed "trackable"!', None)
         ]
 
     @random_seed(1)
     def test_last_round(self):
         game = Game("", num_rounds=2)
-        assert list(game.guess(1, "Player 1", "locus")) == [
+        assert game.guess(1, "Player 1", "locus") == [
             (
                 """Player 1 guessed "locus" for 7 points!
 
@@ -119,7 +119,7 @@ Last round!(
                 "HTML",
             ),
         ]
-        assert list(game.guess(2, "Player 2", "trackable")) == [
+        assert game.guess(2, "Player 2", "trackable") == [
             (
                 """Player 2 guessed "trackable" for 17 points!
 
@@ -136,9 +136,9 @@ Player 1: 7 points""",
     @random_seed(1)
     def test_game_stop(self):
         game = Game("chat_id")
-        list(game.guess(1, "Player 1", "locus"))
-        list(game.guess(2, "Player 2", "lentibulariaceae"))
-        assert list(game.stop()) == [
+        game.guess(1, "Player 1", "locus")
+        game.guess(2, "Player 2", "lentibulariaceae")
+        assert game.stop() == [
             (
                 """*Final scores*
 Player 2: 20 points
@@ -159,7 +159,7 @@ Player 1: 7 points""",
     @random_seed(1)
     def test_game_stop_without_participation(self):
         game = Game("")
-        assert list(game.stop()) == [
+        assert game.stop() == [
             (
                 regex_matcher(
                     r"Here are some words you missed:\n\n([a-z]+\n(\([ansv]\) .+\n?)+\n?)"

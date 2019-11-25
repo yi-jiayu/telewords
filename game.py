@@ -74,10 +74,13 @@ class Game:
     def delete(self):
         redis.delete(f"game:{self.id}")
 
-    def start(self):
+    def _start_gen(self):
         yield self._grid_message()
 
-    def stop(self):
+    def start(self):
+        return list(self._start_gen())
+
+    def _stop_gen(self):
         if self.scores:
             yield self._final_scores_message()
         yield from self._missed_words_message()
@@ -85,7 +88,10 @@ class Game:
             set_player_name(id, name)
         update_leaderboard_scores(self.id, self.scores)
 
-    def guess(self, id, name, guess):
+    def stop(self):
+        return list(self._stop_gen())
+
+    def _guess_gen(self, id, name, guess):
         guess = guess.lower()
         if guess is None:
             return
@@ -99,6 +105,9 @@ class Game:
             guess = wn.morphy(guess)
             if guess in self.words:
                 yield from self.register_guess(id, name, guess)
+
+    def guess(self, *kwargs):
+        return list(self._guess_gen(*kwargs))
 
     def register_guess(self, id, name, guess):
         score = Game.word_score(guess)
