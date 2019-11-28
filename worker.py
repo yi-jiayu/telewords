@@ -72,8 +72,7 @@ async def send_message(chat_id, text, parse_mode="Markdown"):
 
 async def make_telegram_request(method, params):
     url = f"https://api.telegram.org/bot{bot_token}/{method}"
-    async with httpx.AsyncClient() as client:
-        r = await client.post(url, data=params)
+    r = await httpx.post(url, data=params)
     if not 200 <= r.status_code < 400:
         logging.error(r.text)
 
