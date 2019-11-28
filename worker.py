@@ -5,6 +5,7 @@ from enum import Enum
 from os import getenv
 
 import httpx
+import sentry_sdk
 from redis import Redis
 
 from game import Game, get_leaderboard_scores, format_scores
@@ -151,4 +152,5 @@ def main():
 
 
 if __name__ == "__main__":
+    sentry_sdk.init()
     main()
