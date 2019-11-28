@@ -94,6 +94,37 @@ A  N  U  I  E</pre>
         ]
 
     @random_seed(1)
+    def test_batch_guesses(self):
+        game = Game("chat_id")
+        messages = [(1, "Player 1", "locus"), (2, "Player 2", "trackable")]
+        assert game.batch_guess(messages) == [
+            (
+                """Player 1 guessed "locus" for 7 points!
+Player 2 guessed "trackable" for 17 points!
+
+*Current scores*
+Player 2: 17 points
+Player 1: 7 points""",
+                "Markdown",
+            ),
+            (
+                regex_matcher(
+                    fr"""<pre>C  S  R  E  L
+L  O  S  B  A
+S  I  R  A  K
+R  E  U  T  A
+A  N  U  I  E</pre>
+
+{DEFAULT_GAME_LENGTH - 1} rounds remaining!(
+
+<em>Hint: [a-z_ ]+<\/em>\n\([ansv]\) [^\n]+)?"""
+                ),
+                "HTML",
+            ),
+        ]
+        pass
+
+    @random_seed(1)
     def test_last_round(self):
         game = Game("", num_rounds=2)
         assert game.guess(1, "Player 1", "locus") == [

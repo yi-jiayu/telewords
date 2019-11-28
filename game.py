@@ -2,7 +2,7 @@ import os
 import pickle
 import random
 from operator import itemgetter
-from typing import Optional
+from typing import Optional, Tuple
 
 from more_itertools import grouper
 from nltk.corpus import wordnet as wn
@@ -108,6 +108,49 @@ class Game:
 
     def guess(self, *kwargs):
         return list(self._guess_gen(*kwargs))
+
+    def batch_guess(self, messages: [Tuple[int, str, str]]):
+        correct_guesses = self._check_guesses(messages)
+        if correct_guesses:
+            return [
+                self._batch_correct_guess_message(correct_guesses),
+                self._grid_message(),
+            ]
+        return []
+
+    def _batch_correct_guess_message(self, correct_guesses):
+        guesses = "\n".join(
+            f'{name} guessed "{guess}" for {score} points!'
+            for name, guess, score in correct_guesses
+        )
+        return (
+            f"""{guesses}
+
+*Current scores*
+{self._format_scores()}""",
+            "Markdown",
+        )
+
+    def _check_guesses(self, messages: [Tuple[int, str, str]]):
+        correct_guesses = []
+        for player_id, name, guess in messages:
+            correct_guess = None
+            if guess in self.words:
+                correct_guess = guess
+            else:
+                guess = wn.morphy(guess)
+                if guess in self.words:
+                    correct_guess = guess
+            if correct_guess:
+                score = Game.word_score(guess)
+                self.scores[player_id] = self.scores.get(player_id, 0) + score
+                self.players[player_id] = name
+                self.words.remove(guess)
+                self.guesses[guess] = id
+                correct_guesses.append((name, guess, score))
+        if correct_guesses:
+            self.remaining_rounds -= 1
+        return correct_guesses
 
     def register_guess(self, id, name, guess):
         score = Game.word_score(guess)
