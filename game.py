@@ -2,7 +2,7 @@ import os
 import pickle
 import random
 from operator import itemgetter
-from typing import Optional, Tuple
+from typing import Optional
 
 from more_itertools import grouper
 from nltk.corpus import wordnet as wn
@@ -74,83 +74,36 @@ class Game:
     def delete(self):
         redis.delete(f"game:{self.id}")
 
-    def _start_gen(self):
-        yield self._grid_message()
-
     def start(self):
-        return list(self._start_gen())
+        return self._grid_message(), "HTML"
 
-    def _stop_gen(self):
+    def stop(self):
+        message = self._missed_words_message()
         if self.scores:
-            yield self._final_scores_message()
-        yield from self._missed_words_message()
+            message = self._final_scores_message() + "\n\n" + message
         for id, name in self.players.items():
             set_player_name(id, name)
         update_leaderboard_scores(self.id, self.scores)
+        return message, "Markdown"
 
-    def stop(self):
-        return list(self._stop_gen())
-
-    def _guess_gen(self, id, name, guess):
+    def guess(self, id, name, guess):
         guess = guess.lower()
         if guess is None:
             return
         if guess in self.guesses:
             guesser_id = self.guesses[guess]
             guesser_name = self.players[guesser_id]
-            yield f'{guesser_name} already guessed "{guess}"!', None
+            return f'{guesser_name} already guessed "{guess}"!', None
         elif guess in self.words:
-            yield from self.register_guess(id, name, guess)
+            message = self.register_guess(id, name, guess)
         else:
             guess = wn.morphy(guess)
-            if guess in self.words:
-                yield from self.register_guess(id, name, guess)
-
-    def guess(self, *kwargs):
-        return list(self._guess_gen(*kwargs))
-
-    def batch_guess(self, messages: [Tuple[int, str, str]]):
-        correct_guesses = self._check_guesses(messages)
-        if correct_guesses:
-            return [
-                self._batch_correct_guess_message(correct_guesses),
-                self._grid_message(),
-            ]
-        return []
-
-    def _batch_correct_guess_message(self, correct_guesses):
-        guesses = "\n".join(
-            f'{name} guessed "{guess}" for {score} points!'
-            for name, guess, score in correct_guesses
-        )
-        return (
-            f"""{guesses}
-
-*Current scores*
-{self._format_scores()}""",
-            "Markdown",
-        )
-
-    def _check_guesses(self, messages: [Tuple[int, str, str]]):
-        correct_guesses = []
-        for player_id, name, guess in messages:
-            correct_guess = None
-            if guess in self.words:
-                correct_guess = guess
-            else:
-                guess = wn.morphy(guess)
-                if guess in self.words:
-                    correct_guess = guess
-            if correct_guess:
-                score = Game.word_score(guess)
-                self.scores[player_id] = self.scores.get(player_id, 0) + score
-                self.players[player_id] = name
-                self.words.remove(guess)
-                self.guesses[guess] = id
-                correct_guesses.append((name, guess, score))
-        if correct_guesses:
-            self.remaining_rounds -= 1
-        return correct_guesses
+            if guess not in self.words:
+                return
+            message = self.register_guess(id, name, guess)
+        if self.remaining_rounds > 0:
+            message += "\n\n" + self._grid_message()
+        return message, "HTML"
 
     def register_guess(self, id, name, guess):
         score = Game.word_score(guess)
@@ -159,9 +112,7 @@ class Game:
         self.words.remove(guess)
         self.remaining_rounds -= 1
         self.guesses[guess] = id
-        yield self._correct_guess_message(guess, name, score)
-        if self.remaining_rounds > 0:
-            yield self._grid_message()
+        return self._correct_guess_message(guess, name, score)
 
     def is_finished(self):
         return self.remaining_rounds <= 0
@@ -176,7 +127,7 @@ class Game:
         return f"<em>Hint: {hint_text}</em>\n{hint_definition}"
 
     def _final_scores_message(self):
-        return f"*Final scores*\n{self._format_scores()}", "Markdown"
+        return f"*Final scores*\n{self._format_scores()}"
 
     def _correct_guess_message(self, guess, name, score):
         if guess in self.common_words:
@@ -184,13 +135,10 @@ class Game:
         else:
             definition = f"{guess.capitalize()} means:\n{get_definition(guess)}\n\n"
 
-        return (
-            f"""{name} guessed "{guess}" for {score} {"point" if score == 1 else "points"}!
+        return f"""{name} guessed "{guess}" for {score} {"point" if score == 1 else "points"}!
 
-{definition}*Current scores*
-{self._format_scores()}""",
-            "Markdown",
-        )
+{definition}<strong>Current scores</strong>
+{self._format_scores()}"""
 
     def _remaining_rounds_message(self):
         if self.remaining_rounds == 1:
@@ -204,10 +152,7 @@ class Game:
 {self._remaining_rounds_message()}"""
         if random.random() <= HINT_CHANCE:
             message += "\n" + self._hint_message()
-        return (
-            message,
-            "HTML",
-        )
+        return message
 
     def _format_grid(self):
         grid = "\n".join(
@@ -241,7 +186,7 @@ class Game:
             if definition:
                 word += "\n" + definition
             message += "\n\n" + word
-        yield message, None
+        return message
 
 
 def set_player_name(id, name):

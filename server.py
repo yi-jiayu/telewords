@@ -1,5 +1,4 @@
 import logging
-from asyncio import gather
 from os import getenv
 
 import httpx
@@ -38,11 +37,11 @@ async def handle_text(update, text):
 
 
 async def make_guess(game, chat_id, user_id, name, text: str):
-    messages = game.guess(user_id, name, text)
+    messages = [game.guess(user_id, name, text)]
     finished = False
     if game.is_finished():
         finished = True
-        messages.extend(game.stop())
+        messages.append(game.stop())
         game.delete()
     else:
         game.save()
@@ -62,9 +61,9 @@ async def start_game(chat_id, text):
             pass
     game = Game(chat_id, **kwargs)
     games[chat_id] = game
-    messages = game.start()
+    text, parse_mode = game.start()
     game.save()
-    await transduce(chat_id, messages)
+    await send_message(chat_id, text, parse_mode)
 
 
 async def stop_game(chat_id):
@@ -75,9 +74,9 @@ async def stop_game(chat_id):
             f"No game in progress! To start a new game, tag {bot_name} and say start!",
         )
         return
-    messages = game.stop()
+    text, parse_mode = game.stop()
     game.delete()
-    await transduce(chat_id, messages)
+    await send_message(chat_id, text, parse_mode)
     await send_all_time_scores(chat_id)
 
 
@@ -106,8 +105,8 @@ async def make_telegram_request(method, params):
 
 
 async def transduce(chat_id, messages):
-    replies = (send_message(chat_id, text, parse_mode) for text, parse_mode in messages)
-    await gather(*replies)
+    for text, parse_mode in messages:
+        await send_message(chat_id, text, parse_mode)
 
 
 if __name__ == "__main__":
