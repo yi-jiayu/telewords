@@ -1,0 +1,8 @@
+${host} {
+    log stdout
+    errors stderr
+
+    proxy / localhost:8000 {
+        without /
+    }
+}

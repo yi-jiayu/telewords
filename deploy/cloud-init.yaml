@@ -1,0 +1,27 @@
+#cloud-config
+users:
+  - name: telewords
+    shell: /bin/bash
+
+packages:
+  - redis
+  - python3-dev
+  - python3-pip
+
+write_files:
+  - path: /run/telewords/telewords.service
+    encoding: b64
+    content: ${telewords_service_file}
+  - path: /run/telewords/Caddyfile
+    encoding: b64
+    content: ${caddyfile}
+  - path: /run/telewords/caddy_setup.sh
+    encoding: b64
+    content: ${caddy_setup_script}
+  - path: /run/telewords/telewords_setup.sh
+    encoding: b64
+    content: ${telewords_setup_script}
+
+runcmd:
+  - cd /run/telewords && sh -x /run/telewords/telewords_setup.sh
+  - cd /run/telewords && sh -x /run/telewords/caddy_setup.sh

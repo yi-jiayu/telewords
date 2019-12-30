@@ -1,0 +1,5 @@
+id_telewords*
+
+.terraform
+terraform.tfstate*
+terraform.tfvars

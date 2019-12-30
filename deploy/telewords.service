@@ -1,0 +1,15 @@
+[Unit]
+Description=telewords
+After=network.target
+
+[Service]
+Type=simple
+User=telewords
+WorkingDirectory=/home/telewords/telewords
+ExecStart=/home/telewords/telewords/.venv/bin/python server.py
+
+Environment=TELEGRAM_BOT_TOKEN=${bot_token}
+Environment=TELEGRAM_BOT_USERNAME=${bot_username}
+
+[Install]
+WantedBy=multi-user.target
