@@ -37,7 +37,10 @@ async def handle_text(update, text):
 
 
 async def make_guess(game, chat_id, user_id, name, text: str):
-    messages = [game.guess(user_id, name, text)]
+    result = game.guess(user_id, name, text)
+    if result is None:
+        return
+    messages = [result]
     finished = False
     if game.is_finished():
         finished = True
