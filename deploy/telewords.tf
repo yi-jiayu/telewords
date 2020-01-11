@@ -1,3 +1,5 @@
+data "telegram_bot" "telewords" {}
+
 resource "digitalocean_floating_ip" "telewords" {
   region = var.do_region
 }
@@ -8,6 +10,10 @@ resource "aws_route53_record" "telewords" {
   type    = "A"
   ttl     = 300
   records = [digitalocean_floating_ip.telewords.ip_address]
+}
+
+resource "telegram_bot_webhook" "telewords" {
+  url = "https://${var.host}/"
 }
 
 resource "digitalocean_ssh_key" "telewords" {
@@ -26,7 +32,7 @@ resource "digitalocean_droplet" "telewords" {
     ssh_public_key = digitalocean_ssh_key.telewords.public_key,
     telewords_service_file = base64encode(templatefile("telewords.service", {
       bot_token    = var.bot_token,
-      bot_username = var.bot_username,
+      bot_username = "@${data.telegram_bot.telewords.username}",
     })),
     caddyfile              = base64encode(templatefile("Caddyfile", { host = var.host })),
     telewords_setup_script = filebase64("telewords_setup.sh"),

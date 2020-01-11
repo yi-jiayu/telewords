@@ -22,10 +22,6 @@ variable "bot_token" {
   type = string
 }
 
-variable "bot_username" {
-  type = string
-}
-
 variable "ssh_public_key_file" {
   type        = string
   default     = "id_telewords.pub"
