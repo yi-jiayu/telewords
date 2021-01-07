@@ -1,0 +1,109 @@
+import atexit
+import pickle
+from os import getenv
+
+from flask import Flask, jsonify, request
+
+import game
+
+app = Flask(__name__)
+
+bot_token = getenv("TELEGRAM_BOT_TOKEN")
+bot_name = getenv("TELEGRAM_BOT_USERNAME")
+
+state_file = "state.pickle"
+
+
+def load_state():
+    try:
+        with open(state_file, "rb") as f:
+            state = pickle.load(f)
+    except FileNotFoundError:
+        state = {
+            "games": {},
+            "names": {},
+        }
+    return state
+
+
+def save_state(state):
+    with open(state_file, "wb") as f:
+        pickle.dump(state, f)
+
+
+state = load_state()
+atexit.register(lambda: save_state(state))
+
+
+@app.route("/updates", methods=["POST"])
+def handle_update():
+    update = request.get_json()
+    if "message" in update and "text" in update["message"]:
+        text = update["message"]["text"]
+        return handle_text(update, text)
+    return "", 204
+
+
+def handle_text(update, text):
+    chat_id = update["message"]["chat"]["id"]
+    if "start" in text and (chat_id > 0 or bot_name.lower() in text.lower()):
+        return start_game(chat_id)
+    else:
+        sender = update["message"]["from"]
+        return continue_game(chat_id, sender, text)
+
+
+def start_game(chat_id):
+    letters, words = game.new_game()
+    state["games"][chat_id] = {
+        "letters": letters,
+        "remaining_words": words,
+        "discovered_words": set(),
+        "scores": {},
+    }
+    return jsonify(
+        {
+            "method": "sendMessage",
+            "chat_id": chat_id,
+            "text": f"<pre>{game.format(letters)}</pre>\n\n0/{len(words)} words found",
+            "parse_mode": "HTML",
+        }
+    )
+
+
+def format_scores(scores, names):
+    lines = []
+    for user_id, points in scores.items():
+        name = names[user_id]
+        lines.append(f'{name}: {points} {"point" if points == 1 else "points"}')
+    return "\n".join(lines)
+
+
+def continue_game(chat_id, sender, text: str):
+    if chat_id not in state["games"]:
+        return "", 204
+    if len(text) > 7 or not text.isalpha():
+        return "", 204
+    g = state["games"][chat_id]
+    text = text.lower()
+    if text in g["remaining_words"]:
+        user_id = sender["id"]
+        name = sender["first_name"]
+        state["names"][user_id] = name
+        g["scores"][user_id] = g["scores"].get(user_id, 0) + game.score(text)
+        g["discovered_words"].add(text)
+        g["remaining_words"].remove(text)
+        num_discovered_words = len(g["discovered_words"])
+        num_words = len(g["discovered_words"]) + len(g["remaining_words"])
+        return jsonify(
+            {
+                "method": "sendMessage",
+                "chat_id": chat_id,
+                "text": f"""<pre>{game.format(g['letters'])}</pre>
+
+{num_discovered_words}/{num_words} words found
+
+{format_scores(g['scores'], state['names'])}""",
+                "parse_mode": "HTML",
+            }
+        )
