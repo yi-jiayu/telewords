@@ -73,7 +73,8 @@ def continue_game(chat_id, sender, text: str):
         user_id = sender["id"]
         name = sender["first_name"]
         state["names"][user_id] = name
-        g["scores"][user_id] = g["scores"].get(user_id, 0) + game.score(text)
+        points = game.score(text)
+        g["scores"][user_id] = g["scores"].get(user_id, 0) + points
         g["discovered_words"].add(text)
         g["remaining_words"].remove(text)
         num_discovered_words = len(g["discovered_words"])
@@ -82,7 +83,9 @@ def continue_game(chat_id, sender, text: str):
             {
                 "method": "sendMessage",
                 "chat_id": chat_id,
-                "text": f"""<pre>{game.format(g['letters'])}</pre>
+                "text": f"""{state['names'][user_id]} guessed "{text}" for {points} {'point' if points == 1 else 'points'}!
+
+<pre>{game.format(g['letters'])}</pre>
 
 {num_discovered_words}/{num_words} words found
 
