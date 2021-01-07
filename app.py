@@ -90,3 +90,4 @@ def continue_game(chat_id, sender, text: str):
                 "parse_mode": "HTML",
             }
         )
+    return "", 204

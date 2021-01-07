@@ -2,7 +2,7 @@ import pickle
 
 
 class FileStore:
-    def __init__(self, path='state.pickle'):
+    def __init__(self, path="state.pickle"):
         self.path = path
 
     def load(self):
@@ -18,6 +18,6 @@ class FileStore:
 
     def save(self, state):
         with open(self.path, "wb") as f:
-            print('[start] save')
+            print("[start] save")
             pickle.dump(state, f)
-            print('[end  ] save')
+            print("[end  ] save")
