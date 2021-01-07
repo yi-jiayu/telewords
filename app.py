@@ -1,10 +1,10 @@
 import atexit
-import pickle
 from os import getenv
 
 from flask import Flask, jsonify, request
 
 import game
+from store import FileStore
 
 app = Flask(__name__)
 
@@ -13,26 +13,9 @@ bot_name = getenv("TELEGRAM_BOT_USERNAME")
 
 state_file = "state.pickle"
 
-
-def load_state():
-    try:
-        with open(state_file, "rb") as f:
-            state = pickle.load(f)
-    except FileNotFoundError:
-        state = {
-            "games": {},
-            "names": {},
-        }
-    return state
-
-
-def save_state(state):
-    with open(state_file, "wb") as f:
-        pickle.dump(state, f)
-
-
-state = load_state()
-atexit.register(lambda: save_state(state))
+store = FileStore()
+state = store.load()
+atexit.register(lambda: store.save(state))
 
 
 @app.route("/updates", methods=["POST"])
