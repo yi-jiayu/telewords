@@ -17,6 +17,9 @@ store = FileStore()
 state = store.load()
 atexit.register(lambda: store.save(state))
 
+@app.route("/readyz", methods=["GET"])
+def readyz():
+    return "ready", 200
 
 @app.route("/updates", methods=["POST"])
 def handle_update():
