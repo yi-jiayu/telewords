@@ -11,4 +11,4 @@ RUN python -m nltk.downloader -d /usr/local/nltk_data wordnet
 COPY . .
 
 ENV FLASK_APP=app.py
-CMD [ "python", "-m", "flask", "run" ]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
