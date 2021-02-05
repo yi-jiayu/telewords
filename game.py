@@ -13,7 +13,7 @@ def new_game():
         words = {
             w
             for w in wn.all_lemma_names()
-            if 4 <= len(w) <= 7 and set(w).issubset(set(letters)) and letters[3] in w
+            if 4 <= len(w) and set(w).issubset(set(letters)) and letters[3] in w
         }
         for word in words:
             if set(word) == set(letters):
