@@ -12,7 +12,7 @@ app = Flask(__name__)
 bot_token = getenv("TELEGRAM_BOT_TOKEN")
 bot_name = getenv("TELEGRAM_BOT_USERNAME")
 
-state_file = "state.pickle"
+state_file = getenv("STATE_FILE", "state.pickle")
 
 store = FileStore()
 state = store.load()
