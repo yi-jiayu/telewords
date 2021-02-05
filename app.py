@@ -2,6 +2,7 @@ import atexit
 from os import getenv
 
 from flask import Flask, jsonify, request
+from nltk.corpus import wordnet as wn
 
 import game
 from store import FileStore
@@ -17,9 +18,11 @@ store = FileStore()
 state = store.load()
 atexit.register(lambda: store.save(state))
 
+
 @app.route("/readyz", methods=["GET"])
 def readyz():
     return "ready", 200
+
 
 @app.route("/updates", methods=["POST"])
 def handle_update():
@@ -82,12 +85,17 @@ def continue_game(chat_id, sender, text: str):
         g["remaining_words"].remove(text)
         num_discovered_words = len(g["discovered_words"])
         num_words = len(g["discovered_words"]) + len(g["remaining_words"])
+        lemmas = wn.lemmas(text)
+        if len(lemmas) == 1:
+            definition = f'<em>{lemmas[0].synset().definition()}</em>\n'
+        else:
+            definition = ""
         return jsonify(
             {
                 "method": "sendMessage",
                 "chat_id": chat_id,
                 "text": f"""{state['names'][user_id]} guessed "{text}" for {points} {'point' if points == 1 else 'points'}!
-
+{definition}
 <pre>{game.format(g['letters'])}</pre>
 
 {num_discovered_words}/{num_words} words found
