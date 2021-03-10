@@ -71,7 +71,7 @@ def format_scores(scores, names):
 def continue_game(chat_id, sender, text: str):
     if chat_id not in state["games"]:
         return "", 204
-    if len(text) > 7 or not text.isalpha():
+    if not text.isalpha():
         return "", 204
     g = state["games"][chat_id]
     text = text.lower()
