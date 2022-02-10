@@ -75,6 +75,23 @@ def continue_game(chat_id, sender, text: str):
         return "", 204
     g = state["games"][chat_id]
     text = text.lower()
+    if text in g['discovered_words']:
+        num_discovered_words = len(g["discovered_words"])
+        num_words = len(g["discovered_words"]) + len(g["remaining_words"])
+        return jsonify(
+            {
+                "method": "sendMessage",
+                "chat_id": chat_id,
+                "text": f"""Already guessed: {text}
+
+<pre>{game.format(g['letters'])}</pre>
+
+{num_discovered_words}/{num_words} words found
+
+{format_scores(g['scores'], state['names'])}""",
+                "parse_mode": "HTML",
+            }
+        )
     if text in g["remaining_words"]:
         user_id = sender["id"]
         name = sender["first_name"]
