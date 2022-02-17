@@ -1,4 +1,5 @@
 import atexit
+import random
 from os import getenv
 
 from flask import Flask, jsonify, request
@@ -37,9 +38,29 @@ def handle_text(update, text):
     chat_id = update["message"]["chat"]["id"]
     if "start" in text and (chat_id > 0 or bot_name.lower() in text.lower()):
         return start_game(chat_id)
+    elif '/hint' in text:
+        return get_hint(chat_id)
     else:
         sender = update["message"]["from"]
         return continue_game(chat_id, sender, text)
+
+
+def get_hint(chat_id):
+    if chat_id not in state["games"]:
+        return "", 204
+    g = state["games"][chat_id]
+    remaining_words = g['remaining_words']
+    random_word = random.choice(list(remaining_words))
+    lemmas = wn.lemmas(random_word)
+    random_lemma = random.choice(lemmas)
+    definition = random_lemma.synset().definition()
+    return jsonify(
+        {
+            "method": "sendMessage",
+            "chat_id": chat_id,
+            "text": definition
+        }
+    )
 
 
 def start_game(chat_id):
