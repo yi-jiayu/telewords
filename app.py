@@ -71,6 +71,7 @@ def start_game(chat_id):
         "discovered_words": set(),
         "scores": {},
     }
+    store.save(state)
     return jsonify(
         {
             "method": "sendMessage",
@@ -128,6 +129,7 @@ def continue_game(chat_id, sender, text: str):
             definition = f'<em>{lemmas[0].synset().definition()}</em>\n'
         else:
             definition = ""
+        store.save(state)
         return jsonify(
             {
                 "method": "sendMessage",
